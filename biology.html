@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Biology from one engineer’s perspective</title>
+
+<script src="site_libs/header-attrs-2.7/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">David Bramwell</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="biology.html">Biology</a>
+</li>
+<li>
+  <a href="SPC.html">Statistical Process Control</a>
+</li>
+<li>
+  <a href="ML.html">Machine Learning</a>
+</li>
+<li>
+  <a href="diagnostics.html">Clinical Diagnostics</a>
+</li>
+<li>
+  <a href="imageProc.html">Image Processing</a>
+</li>
+<li>
+  <a href="R.html">R</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Biology from one engineer’s perspective</h1>
+
+</div>
+
+
+<p>On this page I go through the influences that drove my interest in biologically inspired solutions and problems.</p>
+<div id="neural-network-based-on-the-input-organization-of-an-identified-neuron-signaling-impending-collision" class="section level2">
+<h2><a href="https://www.researchgate.net/publication/14339904_Neural_network_based_on_the_input_organization_of_an_identified_neuron_signaling_impending_collision">Neural network based on the input organization of an identified neuron signaling impending collision</a></h2>
+<p><a href="https://journals.physiology.org/doi/abs/10.1152/jn.1996.75.3.967" class="uri">https://journals.physiology.org/doi/abs/10.1152/jn.1996.75.3.967</a></p>
+<p><img src="References/locust.png" width="50%" style="display: block; margin: auto;" /></p>
+<p>This first publication was very influential in my early career. It started out of a group project in the third year of my Engineering degree. I coded up all of the graphical elements of the network output that can be seen as the expanding circles in the paper. It was so influential because engineers were and still are taught to think in discrete algorithms or equations that can be logically followed. This biologically inspired neural model could detect objects on a collision course simply by connecting action potentials together in a simple network. In contrast, at the time and still to some degree today the standard approach was to capture an image from a sensor, threshold it, perform edge detection, combine the edges into primitive lines and shapes, try and work out what the primitives were and then try to work out what was in the scene and if it was moving and then if it was likely on a collision course. All of the processing was very complex and too slow to be of practical use and very environment, scene content and illumination dependent.</p>
+<p>The first revelation was that the locust solution didn’t ‘care’ what the object was, only that something was on an intercept course. I was impressed that such a solution existed and that it was beyond what I had ever conceived as a potential solution at the time. I worked on the simulation as a summer intern and the research has been adapted into collision systems in follow on research performed by Claire most notably the 2016 Scientific reports paper where the output of the original simulation can be seen.</p>
+<p>Claire has taken the work further and lots of interesting aspects are covered <a href="https://www.staff.ncl.ac.uk/claire.rind/try1.htm">here</a>.</p>
+<p>It is this taste of biological solutions to engineering problems that led me to undertake my PhD in the physiology department in the medical school on how humans perceive ‘Colour Constancy in Simple and Complex Scenes’.</p>
+</div>
+<div id="colour-constancy-in-simple-and-complex-scenes" class="section level1">
+<h1><a href="https://theses.ncl.ac.uk/jspui/handle/10443/633">Colour Constancy in Simple and Complex Scenes</a></h1>
+<p>“Colour constancy is defined as the ability to perceive the surface colours of objects within scenes as approximately constant through changes in scene illumination. Colour constancy in real life functions so seamlessly that most people do not realise that the colour of the light emanating from an object can change markedly throughout the day. Constancy measurements made in simple scenes constructed from flat coloured patches do not produce constancy of this high degree. The question that must be asked is: what are the features of everyday scenes that improve constancy?”</p>
+<p><img src="References/Thesis1.png" /></p>
+<p>Many people are impressed by computers performing tasks we class as difficult, playing chess for example, but it may be the tasks that we seem to find effortless that provide by far the greatest challenge. The human visual capabilities are some of the most impressive capabilities of any system. Our eyes are not cameras, our eyes provide input but the real richness in what we see comes from an interpretation out brain constructs. No computer system currently comes close to our abilities.</p>
+<p>This following picture is my favourite from my PhD work and shows the seamless process of human versus ‘camera’.</p>
+<p><img src="References/Thesis2.jpg" width="50%" style="display: block; margin: auto;" /></p>
+<p>It was created by taking a picture of the same group of objects under ‘overcast day’ and ‘incandescent’ lighting and putting the banana from the overcast day into the other picture. It shows the physical ‘truth’ of the light entering the eye from the object under the different conditions. We don’t see blue bananas on overcast days because we have ‘colour constancy’.</p>
+<p>A proportion of the compensation is done in the photo receptors in the eye which is somewhat equivalent to adjusting white balance in a camera but our visual system does more. This illusion created by Adelson shows how scene interpretation can have a large effect.</p>
+<p><img src="References/Adelson.png" /></p>
+<p>Patches A1, A2 and B1 and B2 are identical but the scene changes our perception of them.</p>
+<p>There is a video of the illusion that makes it clearer and almost like a magic show. It clearly demonstrates we don’t work like cameras.</p>
+<p>Here on an image: <a href="https://www.youtube.com/watch?v=GALLMJxLvgA" class="uri">https://www.youtube.com/watch?v=GALLMJxLvgA</a></p>
+<p>Here with a real life scene: <a href="https://www.youtube.com/watch?v=z9Sen1HTu5o" class="uri">https://www.youtube.com/watch?v=z9Sen1HTu5o</a></p>
+<p>This ‘intelligence’ is far more challenging to reproduce in a machine than playing chess.</p>
+<div id="proteomics-data" class="section level2">
+<h2>proteomics data</h2>
+<p><a href="https://www.britannica.com/science/Students-t-test" class="uri">https://www.britannica.com/science/Students-t-test</a></p>
+<p>“In 1908 William Sealy Gosset, an Englishman publishing under the pseudonym Student, developed the t-test and t distribution. (Gosset worked at the Guinness brewery in Dublin and found that existing statistical techniques using large samples were not useful for the small sample sizes that he encountered in his work.) The t distribution is a family of curves in which the number of degrees of freedom (the number of independent observations in the sample minus one) specifies a particular curve. As the sample size (and thus the degrees of freedom) increases, the t distribution approaches the bell shape of the standard normal distribution. In practice, for tests involving the mean of a sample of size greater than 30, the normal distribution is usually applied.”</p>
+<p>Small sample sizes are a challenge. They become a much bigger challenge when you measure more and more variables. ’omics technologies (genomics, transciptomics, proteomics etc.) often measure thousands of variables for each sample. This revolution in data brings a whole world of new challenges that the research community is still grappling with. There are many pragmatic challenges in experiment design and machine learning from this “ill balanced” data.</p>
+</div>
+</div>
+
+<hr><footer><p style="text-align:right;font-size: 10px;"><strong>Standard Disclaimers Apply:</strong>&nbsp;&nbsp;All views are my own, use at your own risk.  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &copy;&nbsp;Copyright&nbsp;2021&nbsp;David&nbsp;Bramwell </p></footer>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

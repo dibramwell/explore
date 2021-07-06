@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Machine Learning</title>
+
+<script src="site_libs/header-attrs-2.7/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">David Bramwell</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="biology.html">Biology</a>
+</li>
+<li>
+  <a href="SPC.html">Statistical Process Control</a>
+</li>
+<li>
+  <a href="ML.html">Machine Learning</a>
+</li>
+<li>
+  <a href="diagnostics.html">Clinical Diagnostics</a>
+</li>
+<li>
+  <a href="imageProc.html">Image Processing</a>
+</li>
+<li>
+  <a href="R.html">R</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Machine Learning</h1>
+
+</div>
+
+
+<p>Want great explanations? Then consume lots of the content Cassie creates <a href="https://kozyrkov.medium.com/" class="uri">https://kozyrkov.medium.com/</a></p>
+<p>The overall goal of machine learning is to teach computers to do useful things from examples without the need to break down tasks into algorithmic solutions. Sounds simple but you can often get near comical results (see <a href="https://www.freecodecamp.org/news/chihuahua-or-muffin-my-search-for-the-best-computer-vision-api-cbda4d6b425d/">puppy versus muffin</a> for a reasonable ML solution that can perform spectacularly well ‘in the lab’ and has some potential issues in the real world) where systems don’t actually learn what you intended them too.</p>
+<p><img src="References/puppyMuffin.jfif" width="50%" style="display: block; margin: auto;" /></p>
+<p><br><br></p>
+<div id="books-that-i-found-illuminating-and-i-often-return-to" class="section level1">
+<h1>Books that I found illuminating (and I often return to)</h1>
+<div id="the-elements-of-statistical-learning" class="section level2">
+<h2><a href="https://web.stanford.edu/~hastie/ElemStatLearn/">The Elements of Statistical Learning</a></h2>
+<p>A version is available free online.</p>
+<p>Great detailed background. I particularly like the way it builds from simple models and shows the connections between many approaches. It challenges the ‘this algorithm is best’ approach with highlighting differences and cases where you may want to explore different approaches.</p>
+</div>
+<div id="pyle-d.-1999.-data-preparation-for-data-mining.-united-kingdom-elsevier-science" class="section level2">
+<h2><a href="https://www.amazon.co.uk/Preparation-Mining-Kaufmann-Management-Systems/dp/1558605290">Pyle, D. (1999). Data preparation for data mining. United Kingdom: Elsevier Science</a></h2>
+<p>Once you get past the first hurdle of using various ML algorithms on the example data and move on to trying it on real world problems you soon find that any form of success can depend on the properties, volume and quality of the data. Many properties are obvious such as the data types and number of samples but others can be more subtle. For example different equipment may produce the same ‘measure’ but the values may be rounded or even different. In their paper, <a href="https://academic.oup.com/jjco/article-pdf/29/6/303/5281183/29-6-303.pdf">Kuriyama et al.</a> compare several assays for Prostate Specific Antigen and a quick glance over Figure 2 shows you don’t get exactly the same answers. This may not matter in a large enough data set if the assays are randomly used across groups but there are pragmatic cases where control samples may be collected in different facilities to cases. The data column might just be labeled ‘Total PSA’. These details can matter a great deal when it comes to finding new health insights and designing studies.</p>
+<p>Assumptions can hit you when you don’t realise. As part of one of clinical studies we commissioned standard blood tests. The tests are used in clinical practice in a professional lab and are well controlled. We expected our research broad assays to be less “accurate” but what we didn’t realise is that the clinical lab measures may be rounded. So much so that it is clear in many of our plots and has an effect on the fit performance.</p>
+<p><img src="References/AATfit.png" />The observed vertical groups in the above figure come from rounding in the clinical lab. The lab tests were capable of higher resolution but as part of the regulatory oversight procedures the lab limited the reported values.</p>
+<p>The rounding makes more sense in the context of the clinic. The figure below is a zoomed out version (scaled to three times the measure range normally observed) of the previous figure <img src="References/AATfitZoom.png" /> the orange shaded area denotes the clinically normal range. Generally the clinical result used is ‘normal’ or not and the actual absolute value is not of such a great importance.</p>
+<p>This highlights a second key consideration; What am I actually trying to do? Do I need to predict the absolute value or will a qualitative answer work? The figure above shows an example of this where the Pearson correlation between measures is shown but we also show the ‘confusion matrix’ for calling the samples as normal or not using the different measures. This is important to consider not just in the target for machine learning but also in that certain input variables might have similar data limitations imposed.</p>
+<p>The next biggest consideration is independence of variables or how much they are correlated. Today it is common to capture everything and build large data lakes but many biological measures are not independent; a simple example is BMI which uses height and weight. You might get a data set that reports height, weight and BMI. Obviously BMI is not indepent of the other two and generally your weight will be correlated to your height too. In biological systems it can be very difficult (and sometimes impossible) to measure the underlying (latent) variable you are really targeting and it is common to have multiple correlated that provide a glimpse of the information that is required. This correlation can lead to misleading results and can make important variables seem to be inconsistent (the ‘best’ variable amongst a group of correlates may change depending on the data set used). In proteomics studies this is compounded by the fact we don’t actually know the function of a lot of the measures.</p>
+<p><br><br></p>
+</div>
+</div>
+<div id="machine-learning-and-omics-data" class="section level1">
+<h1>Machine Learning and ’omics data</h1>
+<p>Much of my focus on machine learning has been tied to extracting meaning from “ill balanced” sets. Ill balanced for my purposes is lots of measures in few samples. There are generally two goals; the first is to tell some predefined groups apart given the data (e.g. cancer or not) and the second is to work out what combination of variables allows you to do it which can drive further exploration of potential mechanisms.</p>
+<p>In my experience generating high performance models on the data has not been an issue and there has been little to choose between algorithms. The main issue is it is difficult to derive models that generalise and are not highly tied to a given data set. There is always the problem of volume and quality of data as the data splits necessary to train test and validate models reduces your ability to find them in the first place.</p>
+<p>Some rules of thumb suggest you need 20 samples per group per variable you measure so even in a modest ’omics experiment with 1000 variables that is a very large number of samples. What I tend to explore is how to build reliable models and determine important factors with a lot less samples per variable.</p>
+</div>
+
+<hr><footer><p style="text-align:right;font-size: 10px;"><strong>Standard Disclaimers Apply:</strong>&nbsp;&nbsp;All views are my own, use at your own risk.  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &copy;&nbsp;Copyright&nbsp;2021&nbsp;David&nbsp;Bramwell </p></footer>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
