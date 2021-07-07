@@ -308,7 +308,14 @@ $(document).ready(function () {
 <h1>Machine Learning and ’omics data</h1>
 <p>Much of my focus on machine learning has been tied to extracting meaning from “ill balanced” sets. Ill balanced for my purposes is lots of measures in few samples. There are generally two goals; the first is to tell some predefined groups apart given the data (e.g. cancer or not) and the second is to work out what combination of variables allows you to do it which can drive further exploration of potential mechanisms.</p>
 <p>In my experience generating high performance models on the data has not been an issue and there has been little to choose between algorithms. The main issue is it is difficult to derive models that generalise and are not highly tied to a given data set. There is always the problem of volume and quality of data as the data splits necessary to train test and validate models reduces your ability to find them in the first place.</p>
+<p>This distinction has been noticed by others. In <a href="https://spectrum.ieee.org/view-from-the-valley/artificial-intelligence/machine-learning/andrew-ng-xrays-the-ai-hype.amp.html">Andrew Ng X-Rays the AI Hype</a> he provides a great example:</p>
+<blockquote>
+<p>“It turns out,” Ng said, “that when we collect data from Stanford Hospital, then we train and test on data from the same hospital, indeed, we can publish papers showing [the algorithms] are comparable to human radiologists in spotting certain conditions.”</p>
+<br> But, he said, “It turns out [that when] you take that same model, that same AI system, to an older hospital down the street, with an older machine, and the technician uses a slightly different imaging protocol, that data drifts to cause the performance of AI system to degrade significantly. In contrast, any human radiologist can walk down the street to the older hospital and do just fine.
+</blockquote>
 <p>Some rules of thumb suggest you need 20 samples per group per variable you measure so even in a modest ’omics experiment with 1000 variables that is a very large number of samples. What I tend to explore is how to build reliable models and determine important factors with a lot less samples per variable.</p>
+<p>This leads to an approach that always ‘opens the black box’ as feeding everything in to advanced learning models yields little of use due to the data balance. With thousands of features to select from the most likely outcome is noisy features can be selected to perfectly split any limited data sets and publication bias (i.e. you only publish when it works) weakens the evidence from the often used k-fold split techniques.</p>
+<p>So I often spend my time looking at ‘important factor determination’ / feature selection. In proteomics this is especially important as you have many measures that are not well controlled comparatively speaking to clinical biochemistry measures and it may be better to improve the performance of a promising subset of measures than try to improve the fit on the multiplex data.</p>
 </div>
 <div id="early-predictive-ai-demonstration" class="section level1">
 <h1><a href="References/ABRF2007_Predictive.pdf">Early predictive AI demonstration</a></h1>
@@ -324,10 +331,15 @@ $(document).ready(function () {
 </div>
 <div id="learning-clinical-biochemistry-values" class="section level1">
 <h1>Learning clinical biochemistry values</h1>
+<p>It is common in ’omics to look for new biomarkers for disease. So you mine the variables to find things that split the data set in to defined groups. Almost by definition the grouping information is not perfect (if there was a perfect discriminator then you probably wouldn’t be looking for a new one though if the current procedure is dangerous or prohibitively expensive you may be looking). Also you don’t know in advance whether any variables you have in your data set actually allow you to do the test, whether they are measured well enough or even if you have enough samples (statistical power) to observe the effect.</p>
+<p>We designed our discovery study to have a set of ‘ground truth’ variables. We instructed the hospital lab to take some standard measures. Some were of proteins we knew were measured by the system and some we knew were not. We can use these ‘extrinsic standards’ to test the performance of our measurement workflows and also the various machine learning strategies.</p>
+<p>One of the first interesting observations from doing this is that you rarely get ideal data by accident. What I mean by this is that for some of the clinical biochems most of the patient population was in the normal range. Standard correlation measures are affected by the range of the data so having only ‘normal’ range measures limits the models you can learn and the final performance you can achieve. This wasn’t necessarily a problem with the measurement system but a factor of the samples themselves. Clinical biochemistry tests are often validated using spiked proteins of known amounts for this very reason.</p>
+<p><a href="https://www.linkedin.com/pulse/how-do-we-create-reference-materials-assays-targets-bramwell-phd/">Spiking samples, in the ‘omics context’, is not trivial.</a></p>
 <p><a href="References/NGPAI%202019%20FINAL.pdf"><img src="References/NGPIA.png" /></a></p>
-<video width="800" controls>
+<video width="800" height="800" controls>
 <source src="References/BCVTCombined.FRSS.SCorD.LPixL_AAT_ininAllmodVals_TRAN_Standalone_animation.mp4" type="video/mp4">
 <p>Your browser does not support the video tag. </video></p>
+<p><br><br><br><br></p>
 </div>
 
 <hr><footer><p style="text-align:right;font-size: 10px;"><strong>Standard Disclaimers Apply:</strong>&nbsp;&nbsp;All views are my own, use at your own risk.  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &copy;&nbsp;Copyright&nbsp;2021&nbsp;David&nbsp;Bramwell </p></footer>
