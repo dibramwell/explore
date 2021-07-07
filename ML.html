@@ -336,6 +336,8 @@ $(document).ready(function () {
 <p>One of the first interesting observations from doing this is that you rarely get ideal data by accident. What I mean by this is that for some of the clinical biochems most of the patient population was in the normal range. Standard correlation measures are affected by the range of the data so having only ‘normal’ range measures limits the models you can learn and the final performance you can achieve. This wasn’t necessarily a problem with the measurement system but a factor of the samples themselves. Clinical biochemistry tests are often validated using spiked proteins of known amounts for this very reason.</p>
 <p><a href="https://www.linkedin.com/pulse/how-do-we-create-reference-materials-assays-targets-bramwell-phd/">Spiking samples, in the ‘omics context’, is not trivial.</a></p>
 <p><a href="References/NGPAI%202019%20FINAL.pdf"><img src="References/NGPIA.png" /></a></p>
+<p>The video below shows machine learning using multiple protein measures to predict the absolute amount of transferrin in blood plasma from clinical samples.</p>
+<p>The video shows the result of adding more features (selected by improvement in fit performance). The first analyte chosen is one of the isoforms of transferrin. The next few features are further isoforms and immunoglobulin and alpha-1 anti trypsin (these are acute phase proteins and are potentially being selected as measures of baseline but they will also be correlated with transferrin).</p>
 <video width="800" height="800" controls>
 <source src="References/BCVTCombined.FRSS.SCorD.LPixL_AAT_ininAllmodVals_TRAN_Standalone_animation.mp4" type="video/mp4">
 <p>Your browser does not support the video tag. </video></p>
