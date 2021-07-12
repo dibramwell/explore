@@ -341,9 +341,6 @@ $(document).ready(function () {
 <li>
   <a href="Geom.html">Geometric Image Properties</a>
 </li>
-<li>
-  <a href="about.html">About</a>
-</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         
@@ -483,12 +480,12 @@ $(document).ready(function () {
 <p>and for 647 <img src="procimage/im647%20origGuess.png" width="100%" style="display: block; margin: auto;" /> View full image <a href="procimage/im647%20origGuess.png">procimage/im647 origGuess.png</a></p>
 <p><br><br></p>
 </div>
-<div id="sub-array-patches" class="section level2">
-<h2>Sub Array patches</h2>
+<div id="geometric-assessment-of-sub-array-patches" class="section level2">
+<h2>Geometric assessment of sub array patches</h2>
 <p>We will now cut out and zoom in on the patches, overlay a grid on the feature elements and asses them.</p>
 <p>First we will process and create images and then explore them individually.</p>
-<p>The affine transform uses three points (the top left, top right and bottom right) so the most likely misalignment will be in the bottom right corner. Misalignment in the corner may be due to inaccuracy of the manually selected points or the transformation not being sufficient to overcome the image distortion.</p>
-<p>In general affine performs reasonably well under visual inspection with the exception of Patch 4. The perspective transformation seems to perform well in all cases and is probably the best ‘first step’. We will explore optimising the ‘pad circles’ by minor individual shifting later.</p>
+<p>The affine transform uses three points (the top left, top right and bottom right) so the most likely misalignment will be in the bottom left corner. Misalignment in the corner may be due to inaccuracy of the manually selected points or the transformation not being sufficient to overcome the image distortion.</p>
+<p>In general, affine performs reasonably well under visual inspection with the exception of Patch 4. The perspective transformation seems to perform well in all cases and is probably the best ‘first step’. We may explore optimising the ‘pad circles’ by minor individual shifting in a follow on analysis.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> patchName <span class="kw">in</span> patches:</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    pts<span class="op">=</span>patches[patchName]</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    </span>
@@ -662,19 +659,65 @@ $(document).ready(function () {
 <h4>Zoom of bottom left of patch</h4>
 <p>In general almost all of the features look to be within the outlines with only minor adjustments necessary.</p>
 <p><img src="procimage/im647Patch%203%20BLsubAreaZoomPerspGrid.png" width="100%" style="display: block; margin: auto;" /> View full image <a href="procimage/im647Patch%203%20BLsubAreaZoomPerspGrid.png">procimage/im647Patch 3 BLsubAreaZoomPerspGrid.png</a></p>
+<p><br><br></p>
+</div>
+</div>
+</div>
+<div id="simple-exploration-of-data-extracted-from-array-features-perspective-projection" class="section level2">
+<h2>Simple exploration of data extracted from array features (perspective projection)</h2>
+<p>In this analysis the raw pixel values from the 16 bit image are summed in a small area (plus and minus 5) centred on the projected feature location.</p>
+<p>There are many other approaches we could take but we use this just to have a look.</p>
+<p><br><br></p>
+<div id="histograms-of-features" class="section level4">
+<h4>Histograms of features</h4>
+<p>There is not much to note in these, certainly no obvious ‘off versus on’. Different feature based measures and images with more dynamic range may show a dual peak. Further investigation required.</p>
+<p><img src="procimage/im488Patch%201%20subAreaZoomPerspGridHist.png" width="100%" style="display: block; margin: auto;" /> View full image <a href="procimage/im488Patch%201%20subAreaZoomPerspGridHist.png">procimage/im488Patch 1 subAreaZoomPerspGridHist.png</a></p>
+<p><img src="procimage/im488Patch%202%20subAreaZoomPerspGridHist.png" width="100%" style="display: block; margin: auto;" /> View full image <a href="procimage/im488Patch%202%20subAreaZoomPerspGridHist.png">procimage/im488Patch 2 subAreaZoomPerspGridHist.png</a></p>
+<p><img src="procimage/im488Patch%203%20subAreaZoomPerspGridHist.png" width="100%" style="display: block; margin: auto;" /> View full image <a href="procimage/im488Patch%203%20subAreaZoomPerspGridHist.png">procimage/im488Patch 3 subAreaZoomPerspGridHist.png</a></p>
+<p><img src="procimage/im488Patch%204%20subAreaZoomPerspGridHist.png" width="100%" style="display: block; margin: auto;" /> View full image <a href="procimage/im488Patch%204%20subAreaZoomPerspGridHist.png">procimage/im488Patch 4 subAreaZoomPerspGridHist.png</a></p>
+<p><br><br></p>
+</div>
+<div id="grid-view-of-features" class="section level4">
+<h4>Grid view of features</h4>
+<p>There is not much to note in these either, it is just a convenient compact representation of the patch arrays. Different feature based measures and images with more dynamic range may show different properties. The views are auto scaled to range so single intense features can affect the whole plot. Further investigation required.</p>
+<p><img src="procimage/im488Patch%201%20subAreaZoomPerspGridMatView.png" width="100%" style="display: block; margin: auto;" /> View full image <a href="procimage/im488Patch%201%20subAreaZoomPerspGridMatView.png">procimage/im488Patch 1 subAreaZoomPerspGridMatView.png</a></p>
+<p><img src="procimage/im488Patch%202%20subAreaZoomPerspGridMatView.png" width="100%" style="display: block; margin: auto;" /> View full image <a href="procimage/im488Patch%202%20subAreaZoomPerspGridMatView.png">procimage/im488Patch 2 subAreaZoomPerspGridMatView.png</a></p>
+<p><img src="procimage/im488Patch%203%20subAreaZoomPerspGridMatView.png" width="100%" style="display: block; margin: auto;" /> View full image <a href="procimage/im488Patch%203%20subAreaZoomPerspGridMatView.png">procimage/im488Patch 3 subAreaZoomPerspGridMatView.png</a></p>
+<p><img src="procimage/im488Patch%204%20subAreaZoomPerspGridMatView.png" width="100%" style="display: block; margin: auto;" /> View full image <a href="procimage/im488Patch%204%20subAreaZoomPerspGridMatView.png">procimage/im488Patch 4 subAreaZoomPerspGridMatView.png</a></p>
 <p><br><br><br></p>
 </div>
+</div>
+<div id="conclusions" class="section level2">
+<h2>Conclusions</h2>
+<p><br></p>
+<p>Detailed review of the sub array layout and corrections. Manually driven process where we are assessing the corrections that may be required rather than looking to perform automated analysis.</p>
+<p><br></p>
+<div id="summary-of-the-geometric-analysis" class="section level3">
+<h3>Summary of the geometric analysis</h3>
+<p>Given image 488 a perspective projection of a uniform grid based on four manually selected points per patch appears to produce a good first spatial correction of the image and enables feature data to be extracted.</p>
+<p>On images at least as good as 488 we should be able to compensate for the spatial distortions and reliably extract numerical data in a reasonably small amount of processing time.</p>
+<p>The analysis suggests that if the patch corners can be reliably estimated automatically then array data can be extracted.</p>
+<p>There were no interesting distributional properties in the histograms based on the sum of the pixels in a small area around the projected feature locations. This gives us little guidance for methodology of calling ‘on/off’ for the individual pads.</p>
+<p>Future considerations:</p>
+<ul>
+<li>Automatically find the patch corners,</li>
+<li>Post optimise the projected grid feature locations to compensate for local shifts (allow a small movement in the individual grid centres to optimise data capture),</li>
+<li>Consider optimising the grids over multiple images and then applying an optimised consensus pattern to all of them (assuming the grids do not move between cycles),</li>
+<li>Explore additional pixel combinations for the patch data (this will be more productive on scans with more information due to greater bit depth. Should be done after feature locations have been optimised).</li>
+</ul>
+<p><br><br></p>
+<p><br><br><br></p>
 </div>
 <div id="script-timing" class="section level3">
 <h3>Script timing</h3>
 <p>Script execution timed for ball park purposes but it will include the report generation sections so will be an over estimate of how long it takes.</p>
-<p>All the processing in this analysis including loading and saving images completed in 6.7457442 seconds.</p>
+<p>All the processing in this analysis including loading and saving images completed in 6.9068932 seconds.</p>
 <p><strong>Machine spec:</strong> Processor Intel(R) Core(TM) i9-9900X CPU @ 3.50GHz, 3504 Mhz, 10 Core(s), 64 GB RAM</p>
 </div>
 </div>
 </div>
 
-<hr><footer><p style="text-align:right;font-size: 10px;"><strong>Standard Disclaimers Apply:</strong>&nbsp;&nbsp;All views are my own, use at your own risk.  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &copy;&nbsp;Copyright&nbsp;2021&nbsp;David&nbsp;Bramwell </p></footer>
+<hr><footer><p style="text-align:right;font-size: 10px;"><strong>CONFIDENTIAL</strong>. For attention of intended parties only.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>Standard Disclaimers Apply:</strong>&nbsp;&nbsp;All views are my own, use at your own risk.  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &copy;&nbsp;Copyright&nbsp;2021&nbsp;David&nbsp;Bramwell </p></footer>
 
 
 

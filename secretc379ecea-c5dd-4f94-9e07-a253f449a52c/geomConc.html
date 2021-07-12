@@ -11,7 +11,7 @@
 
 
 
-<title>Overview</title>
+<title>geomConc.utf8</title>
 
 <script src="site_libs/header-attrs-2.7/header-attrs.js"></script>
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
@@ -262,48 +262,10 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Overview</h1>
 
 </div>
 
 
-<p>This website details an overview analysis of two supplied images of fluorescent arrays.</p>
-<p>The images are 2048 by 2048 pixel 16 bit tifs.</p>
-<p>There are a number of analyses building in the depth of analysis.</p>
-<p>Conclusions from the analyses are repeated below for convenience.</p>
-<p>These analyses were intentional performed ‘blind’. This helps to avoid assumptions clouding the direction of the analysis but may have the negative effect of focusing on the wrong problems.</p>
-<p>NOTE: more detailed images are often available for review. Either click the supplied link or when not available right click on the image and select to view it in a new window.</p>
-<p><br><br></p>
-<div id="basic-image-properties-assessment" class="section level2">
-<h2><a href="Basic.html">Basic Image Properties Assessment</a></h2>
-<p><br></p>
-<p>This analysis reviews the quality, in overview, of the array scans concentrating on gray level information and visual review using two custom software tools. It explores overview spatial properties of the sub arrays. This document was created and shared as a <a href="https://docs.google.com/document/d/1HD5zTwwHtkoKV8JlVaynY1Rxw7Cm6WWl9w-Awn7DTEI/edit?usp=sharing">Google Doc</a>. An html export has been included on this site for consistency of access.</p>
-<p><br></p>
-<div id="summary-of-the-basic-analysis" class="section level3">
-<h3>Summary of the basic analysis</h3>
-<p>The images use less than 10% of the available grey levels. Assuming the imaging system is capable of 16 bit capture this is a major loss of information. When working at Nonlinear Dynamics around 80 - 90% of the time in developing algorithms and technical support for the 2D gel product could be attributed to customer image and gel quality.</p>
-<p>Although it may add expense to the unit I believe a major improvement in the data may be obtained by looking at the hardware aspects of the imaging. This may also impact the speed of the instrument (but this depends on if the array moves through the system or stays in place during the probe cycles as simply enabling more than one sample/array at a time could use the imaging down time due to other processes for an overall higher efficiency).</p>
-<p>I believe issues due to array scan and quality will only get worse when the product is in the hands of end users.</p>
-<p>The first goal must be in increasing the grey level range. This may involve exploring:</p>
-<ul>
-<li>Alternative fluorophores,</li>
-<li>Alternative illumination and its intensity,</li>
-<li>The camera used and its associated optics,</li>
-<li>Exposure times (overall scan time penalty),</li>
-<li>Software driven adaptive capture with multiple settings (overall scan time penalty).</li>
-</ul>
-<p>The second goal will be to tackle the rotation of the image and the blurring towards the edges. This may involve exploring:</p>
-<ul>
-<li>Taking a global image and then moving the array to more optimally image each subarray (this could greatly increase capture times),</li>
-<li>Rotation adjustment possible in optics but software options will be explored in the next section,</li>
-<li>Multiple camera systems or alternative technologies such as line scan cameras,</li>
-<li>Checking the depth of field of the camera and that the chip is perfectly perpendicular (edge blurring).</li>
-</ul>
-<p><br><br></p>
-</div>
-</div>
-<div id="geometric-review-of-the-array-patches" class="section level2">
-<h2><a href="Geom.html">Geometric Review of the Array Patches</a></h2>
 <p><br></p>
 <p>Detailed review of the sub array layout and corrections. Manually driven process where we are assessing the corrections that may be required rather than looking to perform automated analysis.</p>
 <p><br></p>
@@ -321,7 +283,6 @@ $(document).ready(function () {
 <li>Explore additional pixel combinations for the patch data (this will be more productive on scans with more information due to greater bit depth. Should be done after feature locations have been optimised).</li>
 </ul>
 <p><br><br></p>
-</div>
 </div>
 
 <hr><footer><p style="text-align:right;font-size: 10px;"><strong>CONFIDENTIAL</strong>. For attention of intended parties only.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>Standard Disclaimers Apply:</strong>&nbsp;&nbsp;All views are my own, use at your own risk.  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &copy;&nbsp;Copyright&nbsp;2021&nbsp;David&nbsp;Bramwell </p></footer>
