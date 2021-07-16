@@ -1,0 +1,733 @@
+---
+title: "Automation Explorations"
+---
+
+In this section we explore the geometric properties of the array itself. In this analysis we specify some data manually and use it to explore array geometric corrections. Once we have an understanding of the distortions we can look at automated correction strategies.
+
+This report section was generated using RMarkdown in RStudio with the [r-reticulate](https://rstudio.github.io/reticulate/index.html) package to support Python sections. The included script generates the figures. 
+
+I used this project to also learn Python (so don't judge the code elements :) ).
+
+I have included the code for your interest but hidden it by default to improve readability.
+
+# Analysis
+
+In this analysis we don't try to correct the base images themselves. A uniform grid of pad locations is projected in to image space to allow us to review how basic transforms perform in capturing the grids.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::knit_engines$set(python=reticulate::eng_python)
+
+library(reticulate)
+
+```
+
+### Python library Setup 
+
+The libraries used in this analysis.
+
+```{python}
+import cv2 as cv
+import numpy as np
+from matplotlib import pyplot as plt
+plt.rcParams["figure.figsize"] = (20,13)
+
+# Simple rowMultiplication used in pad 
+def rowMult(Mat,theRow,xv,yv):
+    return(Mat[theRow,0]*xv+Mat[theRow,1]*yv+Mat[theRow,2])
+
+def gridBorders(theSums,perc):
+  percen=np.percentile(theSums,perc)
+  matchingX=np.arange(0,len(theSums))[theSums<percen]
+  arr=np.array(matchingX[0])
+  for i in np.arange(1,len(matchingX)):
+    if matchingX[i]-matchingX[i-1]!=1:
+      arr=np.append(arr,[matchingX[i-1],matchingX[i]])
+  arr=np.append(arr,matchingX[i])
+  return(arr)
+
+folderStub="procimage/" # enable detailed review in a image review tool
+scaleFac=4 # how much the subAreas are zoomed 
+
+```
+### Manually assessed parameters 
+
+These are the parameters used in this analysis. They came from looking at the 488 image in an imaging tool and noting pixel coordinates.  
+
+```{python}
+
+numPads=123 # got this from counting peaks in a subArea. image 488
+interpad=5  # got this from measuring between peaks in a subArea. image 488
+
+# TL,TR,BR,BL
+# manually selected from 488 image
+patches={
+"Patch 1":np.array([[461,621],[1082,625],[1077,1246],[457,1241]],np.int32),
+"Patch 2":np.array([[1150,626],[1771,630],[1767,1252],[1145,1246]],np.int32),
+"Patch 3":np.array([[456,1310],[1077,1314],[1072,1935],[450,1932]],np.int32),
+"Patch 4":np.array([[1145,1315],[1766,1319],[1763,1942],[1141,1936]],np.int32)
+}
+
+```
+
+
+```{python echo=FALSE}
+# should not need to change anything below here
+e1 = cv.getTickCount()
+```
+
+### Loading and contrast stretching
+
+I am used to viewing black features on a white background so the images are loaded inverted and contrast stretched for viewing. The original 16 bit image is also retained for measurements in feature areas.
+
+```{python}
+fileStub="im488"
+imageFile='_images/FC3344_LOBE_LANEA_0--Stage20--488.tif'
+
+#fileStub="im647"
+#imageFile='_images/FC3344_LOBE_LANEA_0--Stage20--647.tif'
+
+
+# read in 16 bit greyscale tif
+origimg = cv.imread(imageFile,cv.IMREAD_ANYDEPTH )
+
+# invert and contrast stretch an image for display
+lower,upper=np.percentile(origimg,(0.1,99.9))
+greyFac=255/(upper-lower)
+img=255-np.uint8(np.clip(np.floor(greyFac*(origimg-lower)),0,255))
+
+# create a version to draw on
+colimg=cv.cvtColor(img,cv.COLOR_GRAY2RGB)
+
+```
+
+### Guess where the sub arrays may be
+
+The basic review showed that in the 488 image at least the background between the arrays is lower so here we explore a quick and easy way to obtain a 'ball park' estimate which we then could use template matching or a similar approach to derive accurate array edge points instead of the manually supplied ones.
+
+All we are doing is creating a sum of the pixels columns (blue) and then rows (orange). The horizontal green lines mark percentiles of the column sums (we use it to choose a threshold). The vertical red and purple lines are the boundaries that result which are then displayed in cyan on the image.
+
+```{python}
+
+
+laplacian = cv.Laplacian(img,cv.CV_64F)
+sobelx = cv.Sobel(img,cv.CV_64F,1,0,ksize=5)
+sobely = cv.Sobel(img,cv.CV_64F,0,1,ksize=5)
+plt.subplot(2,2,1),plt.imshow(img,cmap = 'gray')
+plt.title('Original'), plt.xticks([]), plt.yticks([])
+plt.subplot(2,2,2),plt.imshow(laplacian,cmap = 'gray')
+plt.title('Laplacian'), plt.xticks([]), plt.yticks([])
+plt.subplot(2,2,3),plt.imshow(sobelx,cmap = 'gray')
+plt.title('Sobel X'), plt.xticks([]), plt.yticks([])
+plt.subplot(2,2,4),plt.imshow(sobely,cmap = 'gray')
+plt.title('Sobel Y'), plt.xticks([]), plt.yticks([])
+plt.show()
+
+higherRes= img
+lowerRes=cv.pyrDown(higherRes)
+
+while lowerRes.shape[0]>64:
+  lowerRes=cv.pyrDown(higherRes)
+  plt.imshow(lowerRes,cmap = 'gray');
+  plt.title('Original'), plt.xticks([]), plt.yticks([]);
+  plt.show();
+  
+  laplacian = cv.Laplacian(lowerRes,cv.CV_64F)
+  plt.imshow(laplacian,cmap = 'gray');
+  plt.title('Laplacian'), plt.xticks([]), plt.yticks([]);
+  plt.show();
+  higherRes=lowerRes
+
+```
+
+```{python echo=FALSE}
+
+import pywt
+import matplotlib.colors as colors
+from matplotlib import cm
+plt.rcParams["figure.figsize"] = (20,13)
+
+wavName='haar'
+data = pywt.swt2(img,wavName, level=5, start_level=0)
+
+cmap = cm.coolwarm
+
+#https://matplotlib.org/stable/tutorials/colors/colormapnorms.html#sphx-glr-tutorials-colors-colormapnorms-py
+
+numLevel=0
+for level in data:
+  LL, (LH, HL, HH) = level
+#  plt.imshow(LH, interpolation='nearest', cmap=plt.cm.hot);
+  plt.pcolormesh(LL, norm=colors.CenteredNorm(), cmap=cmap);
+  plt.colorbar();
+  plt.savefig(folderStub+fileStub+wavName+'L'+str(numLevel)+ ".png");
+  plt.title(fileStub+wavName+'L'+str(numLevel));
+  plt.xticks([]), plt.yticks([]);
+  plt.show();
+  
+  plt.pcolormesh(HH, norm=colors.CenteredNorm(), cmap=cmap);
+  plt.colorbar();
+  plt.savefig(folderStub+fileStub+wavName+'L'+str(numLevel)+ ".png");
+  plt.title(fileStub+wavName+'L'+str(numLevel));
+  plt.xticks([]), plt.yticks([]);
+  plt.show();
+
+#  c = (255*(LH - np.min(LH))/np.ptp(LH)).astype(int)  
+#  ok=cv.imwrite(folderStub+fileStub+wavName+'L'+str(numLevel)+ ".tif",c)
+  numLevel+=1
+
+
+```
+
+
+It seems to work reasonably well with 488 and likely with images with at least bit depth of this level but it is not as clean with 647 but it does reduce the search space a great deal. Cyan are the guesses at the borders between sub arrays and magenta shows the manually defined sub array boundaries.
+
+
+```{python echo=FALSE}
+
+origimg = cv.imread(imageFile,cv.IMREAD_ANYDEPTH )
+
+# invert and contrast stretch an image for display
+lower,upper=np.percentile(origimg,(0.1,99.9))
+greyFac=255/(upper-lower)
+img=np.uint8(np.clip(np.floor(greyFac*(origimg-lower)),0,255))
+
+colimg=cv.cvtColor(img,cv.COLOR_GRAY2RGB)
+# import the necessary packages
+from skimage.feature import peak_local_max,blob_dog
+from skimage.segmentation import watershed
+from scipy import ndimage
+
+import imutils
+
+maxSig=8
+
+blobs_log = blob_log(img, max_sigma=maxSig, num_sigma=10, threshold=.01)
+
+# Compute radii in the 3rd column.
+blobs_log[:, 2] = blobs_log[:, 2] * sqrt(2)
+
+blobs_dog = blob_dog(img, max_sigma=maxSig, threshold=.01)
+blobs_dog[:, 2] = blobs_dog[:, 2] * sqrt(2)
+
+blobs_doh = blob_doh(img, max_sigma=maxSig, threshold=.001)
+
+blobs_list = [blobs_log, blobs_dog, blobs_doh]
+colors = ['yellow', 'lime', 'red']
+titles = ['Laplacian of Gaussian'+str(maxSig), 'Difference of Gaussian',
+          'Determinant of Hessian']
+sequence = zip(blobs_list, colors, titles)
+
+fig, axes = plt.subplots(1, 3, figsize=(20, 13), sharex=True, sharey=True)
+ax = axes.ravel()
+
+for idx, (blobs, color, title) in enumerate(sequence):
+    ax[idx].set_title(title)
+    ax[idx].imshow(colimg)
+    for blob in blobs:
+        y, x, r = blob
+        c = plt.Circle((x, y), r, color=color, linewidth=2, fill=False)
+        ax[idx].add_patch(c)
+    ax[idx].set_axis_off()
+
+plt.tight_layout()
+plt.show()
+
+```
+
+```{python echo=FALSE}
+
+
+# construct the argument parse and parse the arguments
+
+# load the image and perform pyramid mean shift filtering
+# to aid the thresholding step
+shifted = cv.pyrMeanShiftFiltering(img, 21, 51)
+cv.imshow("Input", img)
+# convert the mean shift image to grayscale, then apply
+# Otsu's thresholding
+thresh = cv.threshold(img, 0, img.max(),cv.THRESH_BINARY | cv.THRESH_OTSU)[1]
+cv.imshow("Thresh", thresh)
+ok=cv.imwrite(folderStub+fileStub+ " thresh.tif",thresh)
+
+# compute the exact Euclidean distance from every binary
+# pixel to the nearest zero pixel, then find peaks in this
+# distance map
+D = ndimage.distance_transform_edt(thresh)
+cv.imshow("D", D)
+ok=cv.imwrite(folderStub+fileStub+ " localMax.tif",localMax)
+
+
+localMax = peak_local_max(D, labels=thresh)
+
+
+# perform a connected component analysis on the local peaks,
+# using 8-connectivity, then appy the Watershed algorithm
+markers = ndimage.label(localMax, structure=np.ones((3, 3)))[0]
+labels = watershed(-D, markers, mask=thresh)
+print("[INFO] {} unique segments found".format(len(np.unique(labels)) - 1))
+
+# loop over the unique labels returned by the Watershed
+# algorithm
+for label in np.unique(labels):
+	# if the label is zero, we are examining the 'background'
+	# so simply ignore it
+	if label == 0:
+		continue
+	# otherwise, allocate memory for the label region and draw
+	# it on the mask
+	mask = np.zeros(img.shape, dtype="uint8")
+	mask[labels == label] = 255
+	# detect contours in the mask and grab the largest one
+	cnts = cv.findContours(mask.copy(), cv.RETR_EXTERNAL,cv.CHAIN_APPROX_SIMPLE)
+	cnts = imutils.grab_contours(cnts)
+	c = max(cnts, key=cv.contourArea)
+	# draw a circle enclosing the object
+	((x, y), r) = cv.minEnclosingCircle(c)
+	cv.circle(colimg, (int(x), int(y)), int(r), (0, 255, 0), 2)
+#	cv.putText(colimg, "#{}".format(label), (int(x) - 10, int(y)),cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+# show the output image
+cv.imshow("Output", colimg)
+ok=cv.imwrite(folderStub+fileStub+ " watershed.png",colimg)
+
+```
+<br><br>
+
+## Geometric assessment of sub array patches
+
+We will now cut out and zoom in on the patches, overlay a grid on the feature elements and asses them.
+
+First we will process and create images and then explore them individually.
+
+The affine transform uses three points (the top left, top right and bottom right) so the most likely misalignment will be in the bottom left corner. Misalignment in the corner may be due to inaccuracy of the manually selected points or the transformation not being sufficient to overcome the image distortion.
+
+In general, affine performs reasonably well under visual inspection with the exception of Patch 4. The perspective transformation seems to perform well in all cases and is probably the best 'first step'. We may explore optimising the 'pad circles' by minor individual shifting in a follow on analysis.
+
+
+```{python}
+for patchName in patches:
+    pts=patches[patchName]
+    
+    # create a uniform reference grid based on our manual parameters
+    estimatedRectSide=(numPads-1)*interpad
+    ptsRef=np.array([[0,0],[estimatedRectSide,0],[estimatedRectSide,estimatedRectSide],[0,estimatedRectSide]],np.int32)
+
+    # work out the sub area of the image to crop out
+    cropPad=interpad*3
+    xcrop=min(pts[0:4,0])-cropPad
+    xcropEnd=max(pts[0:4,0])+cropPad
+    ycrop=min(pts[0:4,1])-cropPad*4 # leave space for the text
+    ycropEnd=max(pts[0:4,1])+cropPad
+    xoffset=pts[0,0]-xcrop
+    yoffset=pts[0,1]-ycrop
+    cropOrig=origimg[ycrop:ycropEnd,xcrop:xcropEnd]
+    ok=cv.imwrite(folderStub+fileStub+patchName+ " origCrop.tif", cropOrig)
+
+    
+    # calculate affine and perspective transforms between reference and image space 
+    # based on the manual points
+    Mback = cv.getAffineTransform(np.float32(ptsRef[0:3]),np.float32(pts[0:3]))
+    MbackP = cv.getPerspectiveTransform(np.float32(ptsRef[0:4]),np.float32(pts[0:4]))
+   
+    # create an image to display the affine transformed points
+    cropImg=colimg[ycrop:ycropEnd,xcrop:xcropEnd]
+    resAffine = cv.resize(cropImg,None,fx=scaleFac, fy=scaleFac, interpolation = cv.INTER_NEAREST)
+    ok=cv.imwrite(folderStub+fileStub+patchName+ " subAreaZoom.png", resAffine)
+    resAffine=cv.putText(resAffine,"Affine transformed fixed grid. Manual grid region selection.",(resAffine.shape[0]//8,90),cv.FONT_HERSHEY_SIMPLEX,2,(65535,0,0),2,cv.LINE_AA)
+     
+    # create an image to display the perspective transformed points
+    cropImg=colimg[ycrop:ycropEnd,xcrop:xcropEnd]
+    resPersp = cv.resize(cropImg,None,fx=scaleFac, fy=scaleFac, interpolation = cv.INTER_NEAREST)
+    resPersp=cv.putText(resPersp,"Perspective transformed fixed grid. Manual grid region selection.",(resPersp.shape[0]//8,90),cv.FONT_HERSHEY_SIMPLEX,2,(65535,0,0),2,cv.LINE_AA)
+    
+    rad=np.int32(interpad*scaleFac/2)
+    pixvals=np.empty([numPads,numPads])
+    for y in range(0,numPads):
+        for x in range(0,numPads):
+            xval=np.floor(x*interpad)  
+            yval=np.floor(y*interpad)
+            
+            xtran=rowMult(Mback,0,xval,yval)
+            ytran=rowMult(Mback,1,xval,yval)
+            resAffine=cv.circle(resAffine,(np.int32(scaleFac*(xtran-xcrop)),np.int32(scaleFac*(ytran-ycrop))),rad,(0,65535,0),1)
+            
+            perScale=rowMult(MbackP,2,xval,yval)
+            xtran=rowMult(MbackP,0,xval,yval)/perScale
+            ytran=rowMult(MbackP,1,xval,yval)/perScale
+            resPersp=cv.circle(resPersp,(np.int32(scaleFac*(xtran-xcrop)),np.int32(scaleFac*(ytran-ycrop))),rad,(0,0,65535),1)
+ 
+            # sum the image pixels in a 'pad' centred around the transformed perspective transform
+            # doing the rows and columns this way to match what matshow expects to get things the right way up
+            pixvals[y,x]=np.sum(origimg[np.int32(ytran-interpad):np.int32(ytran+interpad),np.int32(xtran-interpad):np.int32(xtran+interpad)])
+    
+    ok=cv.imwrite(folderStub+fileStub+patchName+ " subAreaZoomAffineGrid.png", resAffine)
+    ok=cv.imwrite(folderStub+fileStub+patchName+ " subAreaZoomPerspGrid.png", resPersp)
+
+    ok=cv.imwrite(folderStub+fileStub+patchName+ " TLsubAreaZoomAffineGrid.png", resAffine[0:500,0:600])
+    ok=cv.imwrite(folderStub+fileStub+patchName+ " TLsubAreaZoomPerspGrid.png", resPersp[0:500,0:600])
+
+
+    ok=cv.imwrite(folderStub+fileStub+patchName+ " BLsubAreaZoomAffineGrid.png", resAffine[2300:2800,0:600])
+    ok=cv.imwrite(folderStub+fileStub+patchName+ " BLsubAreaZoomPerspGrid.png", resPersp[2300:2800,0:600])
+
+    plt.ioff()
+    plt.hist(pixvals.flatten(),bins=256, color = 'r');
+    plt.title('Histogram of pad pixel sums for '+fileStub+' '+patchName);
+    plt.grid(True);
+    plt.savefig(folderStub+fileStub+patchName+ " subAreaZoomPerspGridHist.png");
+    plt.close();
+    
+    plt.ioff()
+    plt.matshow(pixvals,interpolation="none");
+    plt.title('Map of pad pixel sums for '+fileStub+' '+patchName);
+    plt.savefig(folderStub+fileStub+patchName+ " subAreaZoomPerspGridMatView.png");
+    plt.close();
+
+```
+
+### Patch 1
+
+```{r  out.width = "100%",fig.align='center',echo=FALSE}
+patchImageStub <- paste(py$folderStub,py$fileStub,"Patch 1",sep="") 
+currentImage <- paste(patchImageStub," subAreaZoomAffineGrid.png",sep="")
+knitr::include_graphics(currentImage) 
+```
+View full image [`r currentImage`](`r currentImage`)
+
+#### Zoom of top left of patch
+
+```{r  out.width = "100%",fig.align='center',echo=FALSE}
+currentImage <- paste(patchImageStub," TLsubAreaZoomAffineGrid.png",sep="")
+knitr::include_graphics(currentImage) 
+```
+View full image [`r currentImage`](`r currentImage`)
+
+#### Zoom of bottom left of patch
+
+There are quite a few examples of the centre of the dark spots not being aligned in the outlines for the pad.
+
+```{r  out.width = "100%",fig.align='center',echo=FALSE}
+currentImage <- paste(patchImageStub," BLsubAreaZoomAffineGrid.png",sep="")
+knitr::include_graphics(currentImage) 
+```
+View full image [`r currentImage`](`r currentImage`)
+
+
+```{r  out.width = "100%",fig.align='center',echo=FALSE}
+currentImage <- paste(patchImageStub," subAreaZoomPerspGrid.png",sep="")
+knitr::include_graphics(currentImage) 
+```
+View full image [`r currentImage`](`r currentImage`)
+
+```{r  out.width = "100%",fig.align='center',echo=FALSE}
+currentImage <- paste(patchImageStub," TLsubAreaZoomPerspGrid.png",sep="")
+knitr::include_graphics(currentImage) 
+```
+View full image [`r currentImage`](`r currentImage`)
+
+#### Zoom of bottom left of patch
+
+In general almost all of the features look to be within the outlines with only minor adjustments necessary.
+
+```{r  out.width = "100%",fig.align='center',echo=FALSE}
+currentImage <- paste(patchImageStub," BLsubAreaZoomPerspGrid.png",sep="")
+knitr::include_graphics(currentImage) 
+```
+View full image [`r currentImage`](`r currentImage`)
+
+
+### Patch 2
+
+```{r  out.width = "100%",fig.align='center',echo=FALSE}
+patchImageStub <- paste(py$folderStub,py$fileStub,"Patch 2",sep="") 
+currentImage <- paste(patchImageStub," subAreaZoomAffineGrid.png",sep="")
+knitr::include_graphics(currentImage) 
+```
+View full image [`r currentImage`](`r currentImage`)
+
+#### Zoom of top left of patch
+
+```{r  out.width = "100%",fig.align='center',echo=FALSE}
+currentImage <- paste(patchImageStub," TLsubAreaZoomAffineGrid.png",sep="")
+knitr::include_graphics(currentImage) 
+```
+View full image [`r currentImage`](`r currentImage`)
+
+#### Zoom of bottom left of patch
+
+```{r  out.width = "100%",fig.align='center',echo=FALSE}
+currentImage <- paste(patchImageStub," BLsubAreaZoomAffineGrid.png",sep="")
+knitr::include_graphics(currentImage) 
+```
+View full image [`r currentImage`](`r currentImage`)
+
+
+```{r  out.width = "100%",fig.align='center',echo=FALSE}
+currentImage <- paste(patchImageStub," subAreaZoomPerspGrid.png",sep="")
+knitr::include_graphics(currentImage) 
+```
+View full image [`r currentImage`](`r currentImage`)
+
+```{r  out.width = "100%",fig.align='center',echo=FALSE}
+currentImage <- paste(patchImageStub," TLsubAreaZoomPerspGrid.png",sep="")
+knitr::include_graphics(currentImage) 
+```
+View full image [`r currentImage`](`r currentImage`)
+
+#### Zoom of bottom left of patch
+
+```{r  out.width = "100%",fig.align='center',echo=FALSE}
+currentImage <- paste(patchImageStub," BLsubAreaZoomPerspGrid.png",sep="")
+knitr::include_graphics(currentImage) 
+```
+View full image [`r currentImage`](`r currentImage`)
+
+<br><br>
+
+### Patch 3
+
+```{r  out.width = "100%",fig.align='center',echo=FALSE}
+patchImageStub <- paste(py$folderStub,py$fileStub,"Patch 3",sep="") 
+currentImage <- paste(patchImageStub," subAreaZoomAffineGrid.png",sep="")
+knitr::include_graphics(currentImage) 
+```
+View full image [`r currentImage`](`r currentImage`)
+
+#### Zoom of top left of patch
+
+```{r  out.width = "100%",fig.align='center',echo=FALSE}
+currentImage <- paste(patchImageStub," TLsubAreaZoomAffineGrid.png",sep="")
+knitr::include_graphics(currentImage) 
+```
+View full image [`r currentImage`](`r currentImage`)
+
+#### Zoom of bottom left of patch
+
+Alignment generally good. Looks like there is an extra feature just off the centre of the image. This will be a good test image for the outline optimisation as it could draw the outline from the true feature.
+
+```{r  out.width = "100%",fig.align='center',echo=FALSE}
+currentImage <- paste(patchImageStub," BLsubAreaZoomAffineGrid.png",sep="")
+knitr::include_graphics(currentImage) 
+```
+View full image [`r currentImage`](`r currentImage`)
+
+
+```{r  out.width = "100%",fig.align='center',echo=FALSE}
+currentImage <- paste(patchImageStub," subAreaZoomPerspGrid.png",sep="")
+knitr::include_graphics(currentImage) 
+```
+View full image [`r currentImage`](`r currentImage`)
+
+```{r  out.width = "100%",fig.align='center',echo=FALSE}
+currentImage <- paste(patchImageStub," TLsubAreaZoomPerspGrid.png",sep="")
+knitr::include_graphics(currentImage) 
+```
+View full image [`r currentImage`](`r currentImage`)
+
+#### Zoom of bottom left of patch
+
+```{r  out.width = "100%",fig.align='center',echo=FALSE}
+currentImage <- paste(patchImageStub," BLsubAreaZoomPerspGrid.png",sep="")
+knitr::include_graphics(currentImage) 
+```
+View full image [`r currentImage`](`r currentImage`)
+
+<br><br>
+
+### Patch 4
+
+```{r  out.width = "100%",fig.align='center',echo=FALSE}
+patchImageStub <- paste(py$folderStub,py$fileStub,"Patch 4",sep="") 
+currentImage <- paste(patchImageStub," subAreaZoomAffineGrid.png",sep="")
+knitr::include_graphics(currentImage) 
+```
+View full image [`r currentImage`](`r currentImage`)
+
+#### Zoom of top left of patch
+
+```{r  out.width = "100%",fig.align='center',echo=FALSE}
+currentImage <- paste(patchImageStub," TLsubAreaZoomAffineGrid.png",sep="")
+knitr::include_graphics(currentImage) 
+```
+View full image [`r currentImage`](`r currentImage`)
+
+#### Zoom of bottom left of patch
+
+There is clear feature alignment for a distinct proportion of the features signalling that the affine transform is not the best starting estimate.
+
+```{r  out.width = "100%",fig.align='center',echo=FALSE}
+currentImage <- paste(patchImageStub," BLsubAreaZoomAffineGrid.png",sep="")
+knitr::include_graphics(currentImage) 
+```
+View full image [`r currentImage`](`r currentImage`)
+
+
+```{r  out.width = "100%",fig.align='center',echo=FALSE}
+currentImage <- paste(patchImageStub," subAreaZoomPerspGrid.png",sep="")
+knitr::include_graphics(currentImage) 
+```
+View full image [`r currentImage`](`r currentImage`)
+
+```{r  out.width = "100%",fig.align='center',echo=FALSE}
+currentImage <- paste(patchImageStub," TLsubAreaZoomPerspGrid.png",sep="")
+knitr::include_graphics(currentImage) 
+```
+View full image [`r currentImage`](`r currentImage`)
+
+#### Zoom of bottom left of patch
+
+```{r  out.width = "100%",fig.align='center',echo=FALSE}
+currentImage <- paste(patchImageStub," BLsubAreaZoomPerspGrid.png",sep="")
+knitr::include_graphics(currentImage) 
+```
+View full image [`r currentImage`](`r currentImage`)
+
+### Patch 3 : Image 647
+
+There aren't many features to see on 647 but here is a patch example to see the grid overlaid that is based on 488. I chose patch 3 as there was evidence of a 'between grid' feature but there is no indication of it here.
+
+```{r  out.width = "100%",fig.align='center',echo=FALSE}
+patchImageStub <- gsub("488","647",paste(py$folderStub,py$fileStub,"Patch 3",sep="") )
+currentImage <- paste(patchImageStub," subAreaZoomAffineGrid.png",sep="")
+knitr::include_graphics(currentImage) 
+```
+View full image [`r currentImage`](`r currentImage`)
+
+#### Zoom of top left of patch
+
+```{r  out.width = "100%",fig.align='center',echo=FALSE}
+currentImage <- paste(patchImageStub," TLsubAreaZoomAffineGrid.png",sep="")
+knitr::include_graphics(currentImage) 
+```
+View full image [`r currentImage`](`r currentImage`)
+
+#### Zoom of bottom left of patch
+
+There are quite a few examples of the centre of the dark spots not being aligned in the outlines for the pad (in image 488, can't really tell here).
+
+```{r  out.width = "100%",fig.align='center',echo=FALSE}
+currentImage <- paste(patchImageStub," BLsubAreaZoomAffineGrid.png",sep="")
+knitr::include_graphics(currentImage) 
+```
+View full image [`r currentImage`](`r currentImage`)
+
+
+```{r  out.width = "100%",fig.align='center',echo=FALSE}
+currentImage <- paste(patchImageStub," subAreaZoomPerspGrid.png",sep="")
+knitr::include_graphics(currentImage) 
+```
+View full image [`r currentImage`](`r currentImage`)
+
+```{r  out.width = "100%",fig.align='center',echo=FALSE}
+currentImage <- paste(patchImageStub," TLsubAreaZoomPerspGrid.png",sep="")
+knitr::include_graphics(currentImage) 
+```
+View full image [`r currentImage`](`r currentImage`)
+
+#### Zoom of bottom left of patch
+
+In general almost all of the features look to be within the outlines with only minor adjustments necessary.
+
+```{r  out.width = "100%",fig.align='center',echo=FALSE}
+currentImage <- paste(patchImageStub," BLsubAreaZoomPerspGrid.png",sep="")
+knitr::include_graphics(currentImage) 
+```
+View full image [`r currentImage`](`r currentImage`)
+
+<br><br>
+
+## Simple exploration of data extracted from array features (perspective projection)
+
+In this analysis the raw pixel values from the 16 bit image are summed in a small area (plus and minus `r py$interpad`) centred on the projected feature location. 
+
+There are many other approaches we could take but we use this just to have a look. 
+
+<br><br>
+
+#### Histograms of features
+
+There is not much to note in these, certainly no obvious 'off versus on'. Different feature based measures and images with more dynamic range may show a dual peak. Further investigation required.
+
+
+```{r  out.width = "100%",fig.align='center',echo=FALSE}
+patchImageStub <- paste(py$folderStub,py$fileStub,"Patch ",sep="") 
+currentImage <- paste(patchImageStub,"1"," subAreaZoomPerspGridHist.png",sep="")
+knitr::include_graphics(currentImage) 
+```
+View full image [`r currentImage`](`r currentImage`)
+
+```{r  out.width = "100%",fig.align='center',echo=FALSE}
+currentImage <- paste(patchImageStub,"2"," subAreaZoomPerspGridHist.png",sep="")
+knitr::include_graphics(currentImage) 
+```
+View full image [`r currentImage`](`r currentImage`)
+
+```{r  out.width = "100%",fig.align='center',echo=FALSE}
+currentImage <- paste(patchImageStub,"3"," subAreaZoomPerspGridHist.png",sep="")
+knitr::include_graphics(currentImage) 
+```
+View full image [`r currentImage`](`r currentImage`)
+
+```{r  out.width = "100%",fig.align='center',echo=FALSE}
+currentImage <- paste(patchImageStub,"4"," subAreaZoomPerspGridHist.png",sep="")
+knitr::include_graphics(currentImage) 
+```
+View full image [`r currentImage`](`r currentImage`)
+
+
+<br><br>
+
+#### Grid view of features
+
+There is not much to note in these either, it is just a convenient compact representation of the patch arrays. Different feature based measures and images with more dynamic range may show different properties. The views are auto scaled to range so single intense features can affect the whole plot. Further investigation required.
+
+
+```{r  out.width = "100%",fig.align='center',echo=FALSE}
+patchImageStub <- paste(py$folderStub,py$fileStub,"Patch ",sep="") 
+currentImage <- paste(patchImageStub,"1"," subAreaZoomPerspGridMatView.png",sep="")
+knitr::include_graphics(currentImage) 
+```
+View full image [`r currentImage`](`r currentImage`)
+
+```{r  out.width = "100%",fig.align='center',echo=FALSE}
+currentImage <- paste(patchImageStub,"2"," subAreaZoomPerspGridMatView.png",sep="")
+knitr::include_graphics(currentImage) 
+```
+View full image [`r currentImage`](`r currentImage`)
+
+```{r  out.width = "100%",fig.align='center',echo=FALSE}
+currentImage <- paste(patchImageStub,"3"," subAreaZoomPerspGridMatView.png",sep="")
+knitr::include_graphics(currentImage) 
+```
+View full image [`r currentImage`](`r currentImage`)
+
+```{r  out.width = "100%",fig.align='center',echo=FALSE}
+currentImage <- paste(patchImageStub,"4"," subAreaZoomPerspGridMatView.png",sep="")
+knitr::include_graphics(currentImage) 
+```
+View full image [`r currentImage`](`r currentImage`)
+
+
+<br><br><br>
+
+## Conclusions
+
+```{summary,child="geomConc.md"}
+```
+
+<br><br><br>
+
+
+### Script timing
+
+Script execution timed for ball park purposes but it will include the report generation sections so will be an over estimate of how long it takes.
+```{python echo=FALSE}
+e2 = cv.getTickCount()
+runtime = (e2 - e1)/ cv.getTickFrequency()
+```
+All the processing in this analysis including loading and saving images completed in `r py$runtime` seconds.
+
+**Machine spec:** Processor	Intel(R) Core(TM) i9-9900X CPU @ 3.50GHz, 3504 Mhz, 10 Core(s), 64 GB RAM
+
+
+
