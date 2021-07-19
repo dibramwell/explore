@@ -11,7 +11,7 @@
 
 
 
-<title>R and how I tend to use it</title>
+<title>R and Python and how I tend to use them</title>
 
 <script src="site_libs/header-attrs-2.7/header-attrs.js"></script>
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
@@ -260,7 +260,7 @@ $(document).ready(function () {
   <a href="imageProc.html">Image Processing</a>
 </li>
 <li>
-  <a href="R.html">R</a>
+  <a href="R.html">R &amp; Python</a>
 </li>
 <li>
   <a href="about.html">About</a>
@@ -277,13 +277,21 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">R and how I tend to use it</h1>
+<h1 class="title toc-ignore">R and Python and how I tend to use them</h1>
 
 </div>
 
 
+<p>Most of my work is exploratory analysis or prototyping so I often focus in languages that let me do this and then re-code in a more strict language once the path is found.</p>
+<p>This tend to lead to the use of ‘interpretive and interactive’ languages. The freedom can rapidly lead to issues so I tend to write scripts and execute them.</p>
 <p>I always use an IDE (RStudio) and ‘literate programming’ (I now use <a href="https://rmarkdown.rstudio.com/index.html">Rmarkdown</a> though I used to use Sweave). I think it is pretty much a waste of time using interactive mode apart from almost trivial explorations. It is very easy to get a result whilst exploring the data and then not being able to reproduce it. I always use scripts and rerun them.</p>
-<p>RMarkdown and similar tools have additional benefits of making it easy to document as you go along and also that blocks can be cached which help when you have some long running calculations and you are just tuning graphs etc.</p>
+<p>RMarkdown and similar tools have additional benefits of making it easy to document as you go along and also that computational blocks can be cached which helps when you have some long running calculations and you are just tuning graphs etc.</p>
+<p>R base is powerful but a lot of the really value is in the third party packages. This is good and bad as the packages may not be regularly maintained and upgrading even a minor version number of R can suddenly break working code. It can also hit portability as certain machines might have a certain base version and libraries installed that are required to get the results. Extensions have been added that improve this but you usually only notice these when you have a lot of experience in R and have already written lots of scripts aroung the base version.</p>
+<p>I have started looking into Python as an alternative and there is a lot of similar and sometimes better functionality, especially for image and video processing.</p>
+<p><a href="https://docs.opencv.org/3.4/d6/d00/tutorial_py_root.html"><img src="https://docs.opencv.org/3.4/opencv-logo-small.png" /> OpenCV</a></p>
+<p><a href="https://scikit-image.org/"><img src="https://scikit-image.org/_static/img/logo.png" style="width:20.0%" /></a> and <a href="https://pywavelets.readthedocs.io">PyWavelets - Wavelet Transforms in Python</a></p>
+<p>Python has much better language features and portability but you actually don’t have to choose one or the other as RMarkdown and the <a href="https://rstudio.github.io/reticulate/index.html">r-reticulate</a> package lets you mix and match between both.</p>
+<p>This site was created as RMarkdown in RStudio.</p>
 
 <hr><footer><p style="text-align:right;font-size: 10px;"><strong>Standard Disclaimers Apply:</strong>&nbsp;&nbsp;All views are my own, use at your own risk.  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &copy;&nbsp;Copyright&nbsp;2021&nbsp;David&nbsp;Bramwell </p></footer>
 
