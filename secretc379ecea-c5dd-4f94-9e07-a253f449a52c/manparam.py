@@ -24,6 +24,22 @@ def gridBorders(theSums,perc):
   arr=np.append(arr,matchingX[i])
   return(arr)
 
+def ScaledImage(inImage,lower=0,upper=255,maxVal=255,invert=True):
+    greyFac=maxVal/(upper-lower)
+    img=np.clip(np.floor(greyFac*(inImage-lower)),0,maxVal)
+    if invert:
+      img=maxVal-img
+    return(img)
+
+
+def PercentileScaledImage(inImage,lowerPerc=0.1,upperPerc=99.9,maxVal=255,invert=True):
+    lower,upper=np.percentile(inImage,(lowerPerc,upperPerc))
+    return(ScaledImage(inImage,lower=lower,upper=upper,maxVal=maxVal,invert=invert))
+
+def PercentileScaledImageToImage(inImage,scaleRef,lowerPerc=0.1,upperPerc=99.9,maxVal=255,invert=True):
+    lower,upper=np.percentile(scaleRef,(lowerPerc,upperPerc))
+    return(ScaledImage(inImage,lower=lower,upper=upper,maxVal=maxVal,invert=invert))
+
 
 
 numPads=123 # got this from counting peaks in a subArea. image 488

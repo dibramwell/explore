@@ -348,6 +348,9 @@ $(document).ready(function () {
   <a href="WarpWhole.html">Warp Explorations</a>
 </li>
 <li>
+  <a href="Filter.html">Simple Filters</a>
+</li>
+<li>
   <a href="about.html">About</a>
 </li>
       </ul>
@@ -375,55 +378,399 @@ $(document).ready(function () {
 </div>
 
 
-<p>In this section we explore attempting to find the sub arrays automatically and then the features within them (i.e. pad centres adjusted to peak points). So the main goal it to find the sub array locations and fine adjustments within them.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cv2 <span class="im">as</span> cv</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib <span class="im">import</span> pyplot <span class="im">as</span> plt</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pywt</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.colors <span class="im">as</span> colors</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> skimage <span class="im">as</span> sk</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib <span class="im">import</span> cm</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> math <span class="im">import</span> sqrt</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> skimage.feature <span class="im">import</span> blob_dog, blob_log, blob_doh</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>geomfolderStub<span class="op">=</span><span class="st">&quot;procimage/&quot;</span> <span class="co"># enable detailed review in a image review tool</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>folderStub<span class="op">=</span><span class="st">&quot;procimage/filter_&quot;</span> <span class="co"># enable detailed review in a image review tool</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>scaleFac<span class="op">=</span><span class="dv">5</span> <span class="co"># how much the subAreas are zoomed </span></span></code></pre></div>
-<p><img src="Auto_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
-<div id="manually-assessed-parameters" class="section level3">
-<h3>Manually assessed parameters</h3>
-<p>These are the parameters used in the geometric analysis analysis. They came from looking at the 488 image in an imaging tool and noting pixel coordinates.</p>
-<p>We will use the pad estimates here in the algorithms but the patch information will just be used as a reference as we are going to try and seek them automatically.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>numPads<span class="op">=</span><span class="dv">123</span> <span class="co"># got this from counting peaks in a subArea. image 488</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>interpad<span class="op">=</span><span class="dv">5</span>  <span class="co"># got this from measuring between peaks in a subArea. image 488</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>min_sigma<span class="op">=</span><span class="dv">1</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>max_sigma<span class="op">=</span><span class="dv">3</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>threshFac<span class="op">=</span><span class="fl">0.1</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># TL,TR,BR,BL</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># manually selected from 488 image</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>patches<span class="op">=</span>{</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;Patch 1&quot;</span>:np.array([[<span class="dv">461</span><span class="op">-</span>interpad,<span class="dv">621</span><span class="op">-</span>interpad],[<span class="dv">1082</span><span class="op">+</span>interpad,<span class="dv">625</span><span class="op">-</span>interpad],[<span class="dv">1077</span><span class="op">+</span>interpad,<span class="dv">1246</span><span class="op">+</span>interpad],[<span class="dv">457</span><span class="op">-</span>interpad,<span class="dv">1241</span><span class="op">+</span>interpad]],np.int32),</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;Patch 2&quot;</span>:np.array([[<span class="dv">1150</span><span class="op">-</span>interpad,<span class="dv">626</span><span class="op">-</span>interpad],[<span class="dv">1771</span><span class="op">+</span>interpad,<span class="dv">630</span><span class="op">-</span>interpad],[<span class="dv">1767</span><span class="op">+</span>interpad,<span class="dv">1252</span><span class="op">+</span>interpad],[<span class="dv">1145</span><span class="op">-</span>interpad,<span class="dv">1246</span><span class="op">+</span>interpad]],np.int32),</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;Patch 3&quot;</span>:np.array([[<span class="dv">456</span><span class="op">-</span>interpad,<span class="dv">1310</span><span class="op">-</span>interpad],[<span class="dv">1077</span><span class="op">+</span>interpad,<span class="dv">1314</span><span class="op">-</span>interpad],[<span class="dv">1072</span><span class="op">+</span>interpad,<span class="dv">1935</span><span class="op">+</span>interpad],[<span class="dv">450</span><span class="op">-</span>interpad,<span class="dv">1932</span><span class="op">+</span>interpad]],np.int32),</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;Patch 4&quot;</span>:np.array([[<span class="dv">1145</span><span class="op">-</span>interpad,<span class="dv">1315</span><span class="op">-</span>interpad],[<span class="dv">1766</span><span class="op">+</span>interpad,<span class="dv">1319</span><span class="op">-</span>interpad],[<span class="dv">1763</span><span class="op">+</span>interpad,<span class="dv">1942</span><span class="op">+</span>interpad],[<span class="dv">1141</span><span class="op">-</span>interpad,<span class="dv">1936</span><span class="op">+</span>interpad]],np.int32)</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
-<p><img src="Auto_files/figure-html/unnamed-chunk-1-3.png" width="672" /></p>
-<p><img src="Auto_files/figure-html/unnamed-chunk-1-5.png" width="672" /></p>
+<p>Simple explorations for filters. This one simply chains Gaussian filters together and then takes the blurred image as ‘noise and background’. It could do with tuning and works better in some cases than others. Sometimes it can be hard to tell without looking in detail at the image.</p>
+<p>This filter is probably too severe and is better as a filter in front of alignment to improve the probability of that working and once the images are aligned more powerful cross image techniques could be used.</p>
+<p>It is interesting but not earth shattering. More tuning on more images would be required.</p>
+<p>I may look at a DoG filter on the halos more and a few alternative approaches.</p>
+<p>Look in the <a href="about.html">About</a> section for libraries and default parameters.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>geomfolderStub<span class="op">=</span><span class="st">&quot;procimage/&quot;</span> <span class="co"># enable detailed review in a image review tool</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>folderStub<span class="op">=</span><span class="st">&quot;procimage/filter_&quot;</span> <span class="co"># enable detailed review in a image review tool</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>scaleFac<span class="op">=</span><span class="dv">5</span> <span class="co"># how much the subAreas are zoomed </span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> skimage.filters <span class="im">import</span> difference_of_gaussians, window, gaussian</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> SaveImageAndMarkdown(imagePath,theImage,descript):</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span>(<span class="st">&quot;</span><span class="ch">\n\n</span><span class="st">&quot;</span><span class="op">+</span>descript<span class="op">+</span><span class="st">&quot;</span><span class="ch">\n\n</span><span class="st">&quot;</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  ok<span class="op">=</span>cv.imwrite(imagePath, theImage)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span>(<span class="st">&quot;</span><span class="ch">\n\n</span><span class="st">![](&quot;</span><span class="op">+</span>imagePath<span class="op">+</span><span class="st">&quot;)</span><span class="ch">\n\n</span><span class="st">&quot;</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span>(<span class="st">&quot;</span><span class="ch">\n\n</span><span class="st">View full image [&quot;</span><span class="op">+</span>imagePath<span class="op">+</span><span class="st">&quot;](&quot;</span><span class="op">+</span>imagePath<span class="op">+</span><span class="st">&quot;)</span><span class="ch">\n\n</span><span class="st">&quot;</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>imageDir<span class="op">=</span><span class="st">&#39;_images/&#39;</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> imageFileStub <span class="kw">in</span> os.listdir(imageDir):</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  fileWithoutExt<span class="op">=</span>os.path.splitext(imageFileStub)[<span class="dv">0</span>]</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span>(<span class="st">&quot;## &quot;</span><span class="op">+</span>fileWithoutExt<span class="op">+</span><span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  outpath<span class="op">=</span><span class="st">&quot;procimage/&quot;</span><span class="op">+</span>fileWithoutExt<span class="op">+</span><span class="st">&quot;/&quot;</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  os.makedirs(outpath, exist_ok <span class="op">=</span> <span class="va">True</span>)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  image_gray <span class="op">=</span> cv.imread(imageDir<span class="op">+</span>imageFileStub,cv.IMREAD_ANYDEPTH )</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  img_gray_255<span class="op">=</span>np.uint8(PercentileScaledImage(image_gray,lowerPerc<span class="op">=</span><span class="fl">0.1</span>,upperPerc<span class="op">=</span><span class="fl">99.9</span>,maxVal<span class="op">=</span><span class="dv">255</span>,invert<span class="op">=</span><span class="va">False</span>))</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  filtered_image <span class="op">=</span> gaussian(image_gray, <span class="dv">1</span>,preserve_range<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  filtered_image <span class="op">=</span> gaussian(filtered_image,<span class="dv">2</span>,preserve_range<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  filtered_image <span class="op">=</span> gaussian(filtered_image,<span class="dv">3</span>,preserve_range<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>  filtered_image <span class="op">=</span> gaussian(filtered_image,<span class="dv">4</span>,preserve_range<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>  filtered_image <span class="op">=</span> gaussian(filtered_image,<span class="dv">5</span>,preserve_range<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>  filtered_image <span class="op">=</span> gaussian(filtered_image,<span class="dv">6</span>,preserve_range<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>  filtered_image <span class="op">=</span> gaussian(filtered_image,<span class="dv">7</span>,preserve_range<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>  filtered_image <span class="op">=</span> gaussian(filtered_image,<span class="dv">8</span>,preserve_range<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>  img_gray_255_1<span class="op">=</span>np.uint8(PercentileScaledImage(filtered_image,lowerPerc<span class="op">=</span><span class="fl">0.1</span>,upperPerc<span class="op">=</span><span class="fl">99.9</span>,maxVal<span class="op">=</span><span class="dv">255</span>,invert<span class="op">=</span><span class="va">False</span>))</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>  diff_image<span class="op">=</span>image_gray<span class="op">-</span>filtered_image</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>  img_gray_255_2<span class="op">=</span>np.uint8(PercentileScaledImageToImage(diff_image,filtered_image,lowerPerc<span class="op">=</span><span class="fl">0.1</span>,upperPerc<span class="op">=</span><span class="fl">99.9</span>,maxVal<span class="op">=</span><span class="dv">255</span>,invert<span class="op">=</span><span class="va">False</span>))</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>  SaveImageAndMarkdown(outpath<span class="op">+</span>fileWithoutExt<span class="op">+</span> <span class="st">&quot; Input Image.png&quot;</span>,<span class="dv">255</span><span class="op">-</span>img_gray_255,<span class="st">&quot;### Input Image&quot;</span>)</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>  SaveImageAndMarkdown(outpath<span class="op">+</span>fileWithoutExt<span class="op">+</span> <span class="st">&quot; Filtered Image.png&quot;</span>,<span class="dv">255</span><span class="op">-</span>img_gray_255_1,<span class="st">&quot;### Filtered Image&quot;</span>)</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>  SaveImageAndMarkdown(outpath<span class="op">+</span>fileWithoutExt<span class="op">+</span> <span class="st">&quot; Diff Image.png&quot;</span>,<span class="dv">255</span><span class="op">-</span>img_gray_255_2,<span class="st">&quot;### Difference Image&quot;</span>)</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>  img1<span class="op">=</span><span class="dv">255</span><span class="op">-</span>img_gray_255</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>  img2<span class="op">=</span><span class="dv">255</span><span class="op">-</span>img_gray_255_1</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>  img3<span class="op">=</span><span class="dv">255</span><span class="op">-</span>img_gray_255_2</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>  overColour <span class="op">=</span> cv.merge((img3,img1,img3))</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>  ok<span class="op">=</span>cv.imwrite(outpath<span class="op">+</span>fileWithoutExt<span class="op">+</span><span class="st">&#39; Overlay&#39;</span><span class="op">+</span> <span class="st">&quot; ChainFiltered.png&quot;</span>, overColour)</span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>  ok<span class="op">=</span>cv.imwrite(outpath<span class="op">+</span>fileWithoutExt<span class="op">+</span> <span class="st">&quot; ChainFiltered16.tif&quot;</span>, np.uint16(np.clip(diff_image,<span class="dv">0</span>,<span class="dv">65535</span>)))</span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>  SaveImageAndMarkdown(outpath<span class="op">+</span>fileWithoutExt<span class="op">+</span><span class="st">&#39; Overlay&#39;</span><span class="op">+</span> <span class="st">&quot; ChainFiltered.png&quot;</span>,overColour,<span class="st">&quot;### overlay&quot;</span>)</span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a> <span class="co"># limage=filtered_image</span></span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a> <span class="co"># lower=np.min(limage)</span></span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a> <span class="co"># upper=np.max(limage)</span></span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a><span class="co">#  greyFac_65535=65000/(upper-lower) # don&#39;t quite use all the levels</span></span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a> <span class="co"># limg_gray_65535=np.uint16(np.clip(np.floor(greyFac*(limage-lower)),0,65535))</span></span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a><span class="co">#  ok=cv.imwrite(outpath+fileWithoutExt+ &quot; ChainFilteredRange.tif&quot;, np.uint16(limg_gray_65535))</span></span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>  </span></code></pre></div>
+<div id="fc3344_lobe_lanea_0stage20488" class="section level2">
+<h2>FC3344_LOBE_LANEA_0–Stage20–488</h2>
+<div id="input-image" class="section level3">
+<h3>Input Image</h3>
+<p><img src="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488%20Input%20Image.png" /></p>
+<p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488%20Input%20Image.png">procimage/FC3344_LOBE_LANEA_0–Stage20–488/FC3344_LOBE_LANEA_0–Stage20–488 Input Image.png</a></p>
 </div>
-<div id="blob-detection" class="section level2">
-<h2>Blob detection</h2>
-<p>Here we detect the blobs on the images themselves and overlay with the uniform grid. The blob detection does not assume grid patterns or pad sizes (only feature sizes of Gaussian sigma between 1 and 3 in original image space).</p>
-<p>Here we are looking to see how the uniform grid and blobs from im488 overlay on im647.</p>
-<p>The red circles are the perspective projected uniform grid.</p>
-<p>Green outlines are from blob analysis on an inter cubic upscaled (x5) version of im488 (to get higher accuracy of positions and radius).</p>
-<p>The cyan outlines are from blob analysis on an inter cubic upscaled (x5) version of im647 (to get higher accuracy of positions and radius). There will be less.</p>
+<div id="filtered-image" class="section level3">
+<h3>Filtered Image</h3>
+<p><img src="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488%20Filtered%20Image.png" /></p>
+<p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488%20Filtered%20Image.png">procimage/FC3344_LOBE_LANEA_0–Stage20–488/FC3344_LOBE_LANEA_0–Stage20–488 Filtered Image.png</a></p>
+</div>
+<div id="difference-image" class="section level3">
+<h3>Difference Image</h3>
+<p><img src="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488%20Diff%20Image.png" /></p>
+<p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488%20Diff%20Image.png">procimage/FC3344_LOBE_LANEA_0–Stage20–488/FC3344_LOBE_LANEA_0–Stage20–488 Diff Image.png</a></p>
+</div>
+<div id="overlay" class="section level3">
+<h3>overlay</h3>
+<p><img src="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488%20Overlay%20ChainFiltered.png" /></p>
+<p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488%20Overlay%20ChainFiltered.png">procimage/FC3344_LOBE_LANEA_0–Stage20–488/FC3344_LOBE_LANEA_0–Stage20–488 Overlay ChainFiltered.png</a></p>
+</div>
+</div>
+<div id="fc3344_lobe_lanea_0stage20647" class="section level2">
+<h2>FC3344_LOBE_LANEA_0–Stage20–647</h2>
+<div id="input-image-1" class="section level3">
+<h3>Input Image</h3>
+<p><img src="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647%20Input%20Image.png" /></p>
+<p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647%20Input%20Image.png">procimage/FC3344_LOBE_LANEA_0–Stage20–647/FC3344_LOBE_LANEA_0–Stage20–647 Input Image.png</a></p>
+</div>
+<div id="filtered-image-1" class="section level3">
+<h3>Filtered Image</h3>
+<p><img src="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647%20Filtered%20Image.png" /></p>
+<p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647%20Filtered%20Image.png">procimage/FC3344_LOBE_LANEA_0–Stage20–647/FC3344_LOBE_LANEA_0–Stage20–647 Filtered Image.png</a></p>
+</div>
+<div id="difference-image-1" class="section level3">
+<h3>Difference Image</h3>
+<p><img src="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647%20Diff%20Image.png" /></p>
+<p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647%20Diff%20Image.png">procimage/FC3344_LOBE_LANEA_0–Stage20–647/FC3344_LOBE_LANEA_0–Stage20–647 Diff Image.png</a></p>
+</div>
+<div id="overlay-1" class="section level3">
+<h3>overlay</h3>
+<p><img src="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647%20Overlay%20ChainFiltered.png" /></p>
+<p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647%20Overlay%20ChainFiltered.png">procimage/FC3344_LOBE_LANEA_0–Stage20–647/FC3344_LOBE_LANEA_0–Stage20–647 Overlay ChainFiltered.png</a></p>
+</div>
+</div>
+<div id="fc4447_lobe_lanec_0stage08488" class="section level2">
+<h2>FC4447_LOBE_LANEC_0–Stage08–488</h2>
+<div id="input-image-2" class="section level3">
+<h3>Input Image</h3>
+<p><img src="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488%20Input%20Image.png" /></p>
+<p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488%20Input%20Image.png">procimage/FC4447_LOBE_LANEC_0–Stage08–488/FC4447_LOBE_LANEC_0–Stage08–488 Input Image.png</a></p>
+</div>
+<div id="filtered-image-2" class="section level3">
+<h3>Filtered Image</h3>
+<p><img src="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488%20Filtered%20Image.png" /></p>
+<p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488%20Filtered%20Image.png">procimage/FC4447_LOBE_LANEC_0–Stage08–488/FC4447_LOBE_LANEC_0–Stage08–488 Filtered Image.png</a></p>
+</div>
+<div id="difference-image-2" class="section level3">
+<h3>Difference Image</h3>
+<p><img src="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488%20Diff%20Image.png" /></p>
+<p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488%20Diff%20Image.png">procimage/FC4447_LOBE_LANEC_0–Stage08–488/FC4447_LOBE_LANEC_0–Stage08–488 Diff Image.png</a></p>
+</div>
+<div id="overlay-2" class="section level3">
+<h3>overlay</h3>
+<p><img src="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488%20Overlay%20ChainFiltered.png" /></p>
+<p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488%20Overlay%20ChainFiltered.png">procimage/FC4447_LOBE_LANEC_0–Stage08–488/FC4447_LOBE_LANEC_0–Stage08–488 Overlay ChainFiltered.png</a></p>
+</div>
+</div>
+<div id="fc4447_lobe_lanec_0stage08647" class="section level2">
+<h2>FC4447_LOBE_LANEC_0–Stage08–647</h2>
+<div id="input-image-3" class="section level3">
+<h3>Input Image</h3>
+<p><img src="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647%20Input%20Image.png" /></p>
+<p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647%20Input%20Image.png">procimage/FC4447_LOBE_LANEC_0–Stage08–647/FC4447_LOBE_LANEC_0–Stage08–647 Input Image.png</a></p>
+</div>
+<div id="filtered-image-3" class="section level3">
+<h3>Filtered Image</h3>
+<p><img src="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647%20Filtered%20Image.png" /></p>
+<p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647%20Filtered%20Image.png">procimage/FC4447_LOBE_LANEC_0–Stage08–647/FC4447_LOBE_LANEC_0–Stage08–647 Filtered Image.png</a></p>
+</div>
+<div id="difference-image-3" class="section level3">
+<h3>Difference Image</h3>
+<p><img src="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647%20Diff%20Image.png" /></p>
+<p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647%20Diff%20Image.png">procimage/FC4447_LOBE_LANEC_0–Stage08–647/FC4447_LOBE_LANEC_0–Stage08–647 Diff Image.png</a></p>
+</div>
+<div id="overlay-3" class="section level3">
+<h3>overlay</h3>
+<p><img src="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647%20Overlay%20ChainFiltered.png" /></p>
+<p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647%20Overlay%20ChainFiltered.png">procimage/FC4447_LOBE_LANEC_0–Stage08–647/FC4447_LOBE_LANEC_0–Stage08–647 Overlay ChainFiltered.png</a></p>
+</div>
+</div>
+<div id="fc4448_lobe_lanec_0stage08488" class="section level2">
+<h2>FC4448_LOBE_LANEC_0–Stage08–488</h2>
+<div id="input-image-4" class="section level3">
+<h3>Input Image</h3>
+<p><img src="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488%20Input%20Image.png" /></p>
+<p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488%20Input%20Image.png">procimage/FC4448_LOBE_LANEC_0–Stage08–488/FC4448_LOBE_LANEC_0–Stage08–488 Input Image.png</a></p>
+</div>
+<div id="filtered-image-4" class="section level3">
+<h3>Filtered Image</h3>
+<p><img src="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488%20Filtered%20Image.png" /></p>
+<p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488%20Filtered%20Image.png">procimage/FC4448_LOBE_LANEC_0–Stage08–488/FC4448_LOBE_LANEC_0–Stage08–488 Filtered Image.png</a></p>
+</div>
+<div id="difference-image-4" class="section level3">
+<h3>Difference Image</h3>
+<p><img src="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488%20Diff%20Image.png" /></p>
+<p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488%20Diff%20Image.png">procimage/FC4448_LOBE_LANEC_0–Stage08–488/FC4448_LOBE_LANEC_0–Stage08–488 Diff Image.png</a></p>
+</div>
+<div id="overlay-4" class="section level3">
+<h3>overlay</h3>
+<p><img src="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488%20Overlay%20ChainFiltered.png" /></p>
+<p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488%20Overlay%20ChainFiltered.png">procimage/FC4448_LOBE_LANEC_0–Stage08–488/FC4448_LOBE_LANEC_0–Stage08–488 Overlay ChainFiltered.png</a></p>
+</div>
+</div>
+<div id="fc4448_lobe_lanec_0stage08647" class="section level2">
+<h2>FC4448_LOBE_LANEC_0–Stage08–647</h2>
+<div id="input-image-5" class="section level3">
+<h3>Input Image</h3>
+<p><img src="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647%20Input%20Image.png" /></p>
+<p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647%20Input%20Image.png">procimage/FC4448_LOBE_LANEC_0–Stage08–647/FC4448_LOBE_LANEC_0–Stage08–647 Input Image.png</a></p>
+</div>
+<div id="filtered-image-5" class="section level3">
+<h3>Filtered Image</h3>
+<p><img src="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647%20Filtered%20Image.png" /></p>
+<p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647%20Filtered%20Image.png">procimage/FC4448_LOBE_LANEC_0–Stage08–647/FC4448_LOBE_LANEC_0–Stage08–647 Filtered Image.png</a></p>
+</div>
+<div id="difference-image-5" class="section level3">
+<h3>Difference Image</h3>
+<p><img src="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647%20Diff%20Image.png" /></p>
+<p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647%20Diff%20Image.png">procimage/FC4448_LOBE_LANEC_0–Stage08–647/FC4448_LOBE_LANEC_0–Stage08–647 Diff Image.png</a></p>
+</div>
+<div id="overlay-5" class="section level3">
+<h3>overlay</h3>
+<p><img src="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647%20Overlay%20ChainFiltered.png" /></p>
+<p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647%20Overlay%20ChainFiltered.png">procimage/FC4448_LOBE_LANEC_0–Stage08–647/FC4448_LOBE_LANEC_0–Stage08–647 Overlay ChainFiltered.png</a></p>
+</div>
+</div>
+<div id="fc4573_lobe01_lanea_0stage08488" class="section level2">
+<h2>FC4573_LOBE01_LANEA_0–Stage08–488</h2>
+<div id="input-image-6" class="section level3">
+<h3>Input Image</h3>
+<p><img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488%20Input%20Image.png" /></p>
+<p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488%20Input%20Image.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–488/FC4573_LOBE01_LANEA_0–Stage08–488 Input Image.png</a></p>
+</div>
+<div id="filtered-image-6" class="section level3">
+<h3>Filtered Image</h3>
+<p><img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488%20Filtered%20Image.png" /></p>
+<p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488%20Filtered%20Image.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–488/FC4573_LOBE01_LANEA_0–Stage08–488 Filtered Image.png</a></p>
+</div>
+<div id="difference-image-6" class="section level3">
+<h3>Difference Image</h3>
+<p><img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488%20Diff%20Image.png" /></p>
+<p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488%20Diff%20Image.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–488/FC4573_LOBE01_LANEA_0–Stage08–488 Diff Image.png</a></p>
+</div>
+<div id="overlay-6" class="section level3">
+<h3>overlay</h3>
+<p><img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488%20Overlay%20ChainFiltered.png" /></p>
+<p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488%20Overlay%20ChainFiltered.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–488/FC4573_LOBE01_LANEA_0–Stage08–488 Overlay ChainFiltered.png</a></p>
+</div>
+</div>
+<div id="fc4573_lobe01_lanea_0stage08647" class="section level2">
+<h2>FC4573_LOBE01_LANEA_0–Stage08–647</h2>
+<div id="input-image-7" class="section level3">
+<h3>Input Image</h3>
+<p><img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647%20Input%20Image.png" /></p>
+<p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647%20Input%20Image.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–647/FC4573_LOBE01_LANEA_0–Stage08–647 Input Image.png</a></p>
+</div>
+<div id="filtered-image-7" class="section level3">
+<h3>Filtered Image</h3>
+<p><img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647%20Filtered%20Image.png" /></p>
+<p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647%20Filtered%20Image.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–647/FC4573_LOBE01_LANEA_0–Stage08–647 Filtered Image.png</a></p>
+</div>
+<div id="difference-image-7" class="section level3">
+<h3>Difference Image</h3>
+<p><img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647%20Diff%20Image.png" /></p>
+<p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647%20Diff%20Image.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–647/FC4573_LOBE01_LANEA_0–Stage08–647 Diff Image.png</a></p>
+</div>
+<div id="overlay-7" class="section level3">
+<h3>overlay</h3>
+<p><img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647%20Overlay%20ChainFiltered.png" /></p>
+<p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647%20Overlay%20ChainFiltered.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–647/FC4573_LOBE01_LANEA_0–Stage08–647 Overlay ChainFiltered.png</a></p>
+</div>
+</div>
+<div id="fc4575_lobe01_laneb_0stage17488" class="section level2">
+<h2>FC4575_LOBE01_LANEB_0–Stage17–488</h2>
+<div id="input-image-8" class="section level3">
+<h3>Input Image</h3>
+<p><img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488%20Input%20Image.png" /></p>
+<p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488%20Input%20Image.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–488/FC4575_LOBE01_LANEB_0–Stage17–488 Input Image.png</a></p>
+</div>
+<div id="filtered-image-8" class="section level3">
+<h3>Filtered Image</h3>
+<p><img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488%20Filtered%20Image.png" /></p>
+<p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488%20Filtered%20Image.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–488/FC4575_LOBE01_LANEB_0–Stage17–488 Filtered Image.png</a></p>
+</div>
+<div id="difference-image-8" class="section level3">
+<h3>Difference Image</h3>
+<p><img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488%20Diff%20Image.png" /></p>
+<p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488%20Diff%20Image.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–488/FC4575_LOBE01_LANEB_0–Stage17–488 Diff Image.png</a></p>
+</div>
+<div id="overlay-8" class="section level3">
+<h3>overlay</h3>
+<p><img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488%20Overlay%20ChainFiltered.png" /></p>
+<p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488%20Overlay%20ChainFiltered.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–488/FC4575_LOBE01_LANEB_0–Stage17–488 Overlay ChainFiltered.png</a></p>
+</div>
+</div>
+<div id="fc4575_lobe01_laneb_0stage17647" class="section level2">
+<h2>FC4575_LOBE01_LANEB_0–Stage17–647</h2>
+<div id="input-image-9" class="section level3">
+<h3>Input Image</h3>
+<p><img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647%20Input%20Image.png" /></p>
+<p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647%20Input%20Image.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–647/FC4575_LOBE01_LANEB_0–Stage17–647 Input Image.png</a></p>
+</div>
+<div id="filtered-image-9" class="section level3">
+<h3>Filtered Image</h3>
+<p><img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647%20Filtered%20Image.png" /></p>
+<p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647%20Filtered%20Image.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–647/FC4575_LOBE01_LANEB_0–Stage17–647 Filtered Image.png</a></p>
+</div>
+<div id="difference-image-9" class="section level3">
+<h3>Difference Image</h3>
+<p><img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647%20Diff%20Image.png" /></p>
+<p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647%20Diff%20Image.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–647/FC4575_LOBE01_LANEB_0–Stage17–647 Diff Image.png</a></p>
+</div>
+<div id="overlay-9" class="section level3">
+<h3>overlay</h3>
+<p><img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647%20Overlay%20ChainFiltered.png" /></p>
+<p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647%20Overlay%20ChainFiltered.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–647/FC4575_LOBE01_LANEB_0–Stage17–647 Overlay ChainFiltered.png</a></p>
+</div>
+</div>
+<div id="fc4575_lobe02_laneb_0stage17488" class="section level2">
+<h2>FC4575_LOBE02_LANEB_0–Stage17–488</h2>
+<div id="input-image-10" class="section level3">
+<h3>Input Image</h3>
+<p><img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488%20Input%20Image.png" /></p>
+<p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488%20Input%20Image.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–488/FC4575_LOBE02_LANEB_0–Stage17–488 Input Image.png</a></p>
+</div>
+<div id="filtered-image-10" class="section level3">
+<h3>Filtered Image</h3>
+<p><img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488%20Filtered%20Image.png" /></p>
+<p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488%20Filtered%20Image.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–488/FC4575_LOBE02_LANEB_0–Stage17–488 Filtered Image.png</a></p>
+</div>
+<div id="difference-image-10" class="section level3">
+<h3>Difference Image</h3>
+<p><img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488%20Diff%20Image.png" /></p>
+<p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488%20Diff%20Image.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–488/FC4575_LOBE02_LANEB_0–Stage17–488 Diff Image.png</a></p>
+</div>
+<div id="overlay-10" class="section level3">
+<h3>overlay</h3>
+<p><img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488%20Overlay%20ChainFiltered.png" /></p>
+<p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488%20Overlay%20ChainFiltered.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–488/FC4575_LOBE02_LANEB_0–Stage17–488 Overlay ChainFiltered.png</a></p>
+</div>
+</div>
+<div id="fc4575_lobe02_laneb_0stage17647" class="section level2">
+<h2>FC4575_LOBE02_LANEB_0–Stage17–647</h2>
+<div id="input-image-11" class="section level3">
+<h3>Input Image</h3>
+<p><img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647%20Input%20Image.png" /></p>
+<p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647%20Input%20Image.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–647/FC4575_LOBE02_LANEB_0–Stage17–647 Input Image.png</a></p>
+</div>
+<div id="filtered-image-11" class="section level3">
+<h3>Filtered Image</h3>
+<p><img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647%20Filtered%20Image.png" /></p>
+<p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647%20Filtered%20Image.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–647/FC4575_LOBE02_LANEB_0–Stage17–647 Filtered Image.png</a></p>
+</div>
+<div id="difference-image-11" class="section level3">
+<h3>Difference Image</h3>
+<p><img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647%20Diff%20Image.png" /></p>
+<p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647%20Diff%20Image.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–647/FC4575_LOBE02_LANEB_0–Stage17–647 Diff Image.png</a></p>
+</div>
+<div id="overlay-11" class="section level3">
+<h3>overlay</h3>
+<p><img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647%20Overlay%20ChainFiltered.png" /></p>
+<p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647%20Overlay%20ChainFiltered.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–647/FC4575_LOBE02_LANEB_0–Stage17–647 Overlay ChainFiltered.png</a></p>
+</div>
+</div>
+<div id="fc4899_lobe_01__laneb_0stage08488" class="section level2">
+<h2>FC4899_LOBE_01__LANEB_0–Stage08–488</h2>
+<div id="input-image-12" class="section level3">
+<h3>Input Image</h3>
+<p><img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488%20Input%20Image.png" /></p>
+<p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488%20Input%20Image.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–488/FC4899_LOBE_01__LANEB_0–Stage08–488 Input Image.png</a></p>
+</div>
+<div id="filtered-image-12" class="section level3">
+<h3>Filtered Image</h3>
+<p><img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488%20Filtered%20Image.png" /></p>
+<p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488%20Filtered%20Image.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–488/FC4899_LOBE_01__LANEB_0–Stage08–488 Filtered Image.png</a></p>
+</div>
+<div id="difference-image-12" class="section level3">
+<h3>Difference Image</h3>
+<p><img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488%20Diff%20Image.png" /></p>
+<p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488%20Diff%20Image.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–488/FC4899_LOBE_01__LANEB_0–Stage08–488 Diff Image.png</a></p>
+</div>
+<div id="overlay-12" class="section level3">
+<h3>overlay</h3>
+<p><img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488%20Overlay%20ChainFiltered.png" /></p>
+<p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488%20Overlay%20ChainFiltered.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–488/FC4899_LOBE_01__LANEB_0–Stage08–488 Overlay ChainFiltered.png</a></p>
+</div>
+</div>
+<div id="fc4899_lobe_01__laneb_0stage08647" class="section level2">
+<h2>FC4899_LOBE_01__LANEB_0–Stage08–647</h2>
+<div id="input-image-13" class="section level3">
+<h3>Input Image</h3>
+<p><img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647%20Input%20Image.png" /></p>
+<p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647%20Input%20Image.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–647/FC4899_LOBE_01__LANEB_0–Stage08–647 Input Image.png</a></p>
+</div>
+<div id="filtered-image-13" class="section level3">
+<h3>Filtered Image</h3>
+<p><img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647%20Filtered%20Image.png" /></p>
+<p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647%20Filtered%20Image.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–647/FC4899_LOBE_01__LANEB_0–Stage08–647 Filtered Image.png</a></p>
+</div>
+<div id="difference-image-13" class="section level3">
+<h3>Difference Image</h3>
+<p><img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647%20Diff%20Image.png" /></p>
+<p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647%20Diff%20Image.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–647/FC4899_LOBE_01__LANEB_0–Stage08–647 Diff Image.png</a></p>
+</div>
+<div id="overlay-13" class="section level3">
+<h3>overlay</h3>
+<p><img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647%20Overlay%20ChainFiltered.png" /></p>
+<p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647%20Overlay%20ChainFiltered.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–647/FC4899_LOBE_01__LANEB_0–Stage08–647 Overlay ChainFiltered.png</a></p>
+<p>Time for this code chunk to run: 32.762 s</p>
+</div>
 <div id="script-timing" class="section level3">
 <h3>Script timing</h3>
 <p>Script execution timed for ball park purposes but it will include the report generation sections so will be an over estimate of how long it takes.</p>
-<p>All the processing in this analysis including loading and saving images completed in 5.533865 seconds.</p>
+<p>All the processing in this analysis including loading and saving images completed in 33.0384587 seconds.</p>
 <p><strong>Machine spec:</strong> Processor Intel(R) Core(TM) i9-9900X CPU @ 3.50GHz, 3504 Mhz, 10 Core(s), 64 GB RAM</p>
 </div>
 </div>
