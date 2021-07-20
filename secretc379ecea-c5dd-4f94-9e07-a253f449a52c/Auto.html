@@ -328,7 +328,7 @@ $(document).ready(function () {
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="index.html">ArrayAnalysis</a>
+      <a class="navbar-brand" href="index.html">Array Analysis</a>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
@@ -343,6 +343,12 @@ $(document).ready(function () {
 </li>
 <li>
   <a href="Auto.html">Automation Explorations</a>
+</li>
+<li>
+  <a href="WarpWhole.html">Warp Explorations</a>
+</li>
+<li>
+  <a href="about.html">About</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -370,63 +376,12 @@ $(document).ready(function () {
 
 
 <p>In this section we explore attempting to find the sub arrays automatically and then the features within them (i.e. pad centres adjusted to peak points). So the main goal it to find the sub array locations and fine adjustments within them.</p>
-<p>This report section was generated using RMarkdown in RStudio with the <a href="https://rstudio.github.io/reticulate/index.html">r-reticulate</a> package to support Python sections. The included script generates the figures.</p>
-<p>I used this project to also learn Python (so don’t judge the code elements :) ).</p>
-<p>I have included the code for your interest but hidden it by default to improve readability.</p>
-<p>I have tried to leave in ‘failures’ so you can see how the thought processes progressed.</p>
 <p>The ‘automation’ will be highly tuned to image 488 but the chosen processes will try to avoid over customisation (e.g. use gradient info rather than grey level thresholds etc.)</p>
-<div id="python-library-setup" class="section level3">
-<h3>Python library Setup</h3>
-<p>The libraries used in this analysis.</p>
-<p>We are using additional libraries here</p>
-<p><a href="https://scikit-image.org/"><img src="https://scikit-image.org/_static/img/logo.png" style="width:20.0%" /></a> and <a href="https://pywavelets.readthedocs.io">PyWavelets - Wavelet Transforms in Python</a></p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cv2 <span class="im">as</span> cv</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib <span class="im">import</span> pyplot <span class="im">as</span> plt</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pywt</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.colors <span class="im">as</span> colors</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib <span class="im">import</span> cm</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> math <span class="im">import</span> sqrt</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> skimage.feature <span class="im">import</span> blob_dog, blob_log, blob_doh</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co">#plt.rcParams[&quot;figure.figsize&quot;] = (20,13)</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Simple rowMultiplication used in pad </span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>rowMult<span class="op">=</span> <span class="kw">lambda</span> Mat,theRow,xv,yv: Mat[theRow,<span class="dv">0</span>]<span class="op">*</span>xv<span class="op">+</span>Mat[theRow,<span class="dv">1</span>]<span class="op">*</span>yv<span class="op">+</span>Mat[theRow,<span class="dv">2</span>]</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> gridBorders(theSums,perc):</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  percen<span class="op">=</span>np.percentile(theSums,perc)</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  matchingX<span class="op">=</span>np.arange(<span class="dv">0</span>,<span class="bu">len</span>(theSums))[theSums<span class="op">&lt;</span>percen]</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  arr<span class="op">=</span>np.array(matchingX[<span class="dv">0</span>])</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> i <span class="kw">in</span> np.arange(<span class="dv">1</span>,<span class="bu">len</span>(matchingX)):</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> matchingX[i]<span class="op">-</span>matchingX[i<span class="op">-</span><span class="dv">1</span>]<span class="op">!=</span><span class="dv">1</span>:</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>      arr<span class="op">=</span>np.append(arr,[matchingX[i<span class="op">-</span><span class="dv">1</span>],matchingX[i]])</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  arr<span class="op">=</span>np.append(arr,matchingX[i])</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span>(arr)</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>geomfolderStub<span class="op">=</span><span class="st">&quot;procimage/&quot;</span> <span class="co"># enable detailed review in a image review tool</span></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>folderStub<span class="op">=</span><span class="st">&quot;procimage/auto_&quot;</span> <span class="co"># enable detailed review in a image review tool</span></span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>scaleFac<span class="op">=</span><span class="dv">5</span> <span class="co"># how much the subAreas are zoomed </span></span></code></pre></div>
-</div>
-<div id="manually-assessed-parameters" class="section level3">
-<h3>Manually assessed parameters</h3>
-<p>These are the parameters used in the geometric analysis analysis. They came from looking at the 488 image in an imaging tool and noting pixel coordinates.</p>
-<p>We will use the pad estimates here in the algorithms but the patch information will just be used as a reference as we are going to try and seek them automatically.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>numPads<span class="op">=</span><span class="dv">123</span> <span class="co"># got this from counting peaks in a subArea. image 488</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>interpad<span class="op">=</span><span class="dv">5</span>  <span class="co"># got this from measuring between peaks in a subArea. image 488</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># TL,TR,BR,BL</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># manually selected from 488 image</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>patches<span class="op">=</span>{</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;Patch 1&quot;</span>:np.array([[<span class="dv">461</span>,<span class="dv">621</span>],[<span class="dv">1082</span>,<span class="dv">625</span>],[<span class="dv">1077</span>,<span class="dv">1246</span>],[<span class="dv">457</span>,<span class="dv">1241</span>]],np.int32),</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;Patch 2&quot;</span>:np.array([[<span class="dv">1150</span>,<span class="dv">626</span>],[<span class="dv">1771</span>,<span class="dv">630</span>],[<span class="dv">1767</span>,<span class="dv">1252</span>],[<span class="dv">1145</span>,<span class="dv">1246</span>]],np.int32),</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;Patch 3&quot;</span>:np.array([[<span class="dv">456</span>,<span class="dv">1310</span>],[<span class="dv">1077</span>,<span class="dv">1314</span>],[<span class="dv">1072</span>,<span class="dv">1935</span>],[<span class="dv">450</span>,<span class="dv">1932</span>]],np.int32),</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;Patch 4&quot;</span>:np.array([[<span class="dv">1145</span>,<span class="dv">1315</span>],[<span class="dv">1766</span>,<span class="dv">1319</span>],[<span class="dv">1763</span>,<span class="dv">1942</span>],[<span class="dv">1141</span>,<span class="dv">1936</span>]],np.int32)</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
-</div>
+<p>Look in the <a href="about.html">About</a> section for libraries and default parameters.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>geomfolderStub<span class="op">=</span><span class="st">&quot;procimage/&quot;</span> <span class="co"># enable detailed review in a image review tool</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>folderStub<span class="op">=</span><span class="st">&quot;procimage/auto_&quot;</span> <span class="co"># enable detailed review in a image review tool</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>scaleFac<span class="op">=</span><span class="dv">5</span> <span class="co"># how much the subAreas are zoomed </span></span></code></pre></div>
 <div id="blob-detection-algorithms" class="section level2">
 <h2>Blob detection algorithms</h2>
 <p>Compare three approaches on im 448. Cyan circles are simply bigger fitted radii we could post correct. The out of count is just from assuming the number of pads in the sub array.</p>
@@ -439,7 +394,7 @@ $(document).ready(function () {
 <p>The red circles are the perspective projected uniform grid.</p>
 <p>Green outlines are from blob analysis on an inter cubic upscaled (x5) version of im488 (to get higher accuracy of positions and radius).</p>
 <p>The cyan outlines are from blob analysis on an inter cubic upscaled (x5) version of im647 (to get higher accuracy of positions and radius). There will be less.</p>
-<p>1088 features detected on im647 and 12155 features detected on im647.</p>
+<p>1093 features detected on im647 and 12246 features detected on im488.</p>
 <div id="patch-1" class="section level3">
 <h3>Patch 1</h3>
 <p><img src="procimage/auto_im647Patch%201%20subAreaZoomPerspGrid.png" width="100%" style="display: block; margin: auto;" /> View full image <a href="procimage/auto_im647Patch%201%20subAreaZoomPerspGrid.png">procimage/auto_im647Patch 1 subAreaZoomPerspGrid.png</a></p>
@@ -496,7 +451,7 @@ $(document).ready(function () {
 <div id="script-timing" class="section level3">
 <h3>Script timing</h3>
 <p>Script execution timed for ball park purposes but it will include the report generation sections so will be an over estimate of how long it takes.</p>
-<p>All the processing in this analysis including loading and saving images completed in 252.3292764 seconds.</p>
+<p>All the processing in this analysis including loading and saving images completed in 258.1054257 seconds.</p>
 <p><strong>Machine spec:</strong> Processor Intel(R) Core(TM) i9-9900X CPU @ 3.50GHz, 3504 Mhz, 10 Core(s), 64 GB RAM</p>
 </div>
 </div>
