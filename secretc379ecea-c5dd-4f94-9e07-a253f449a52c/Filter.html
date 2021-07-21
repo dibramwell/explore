@@ -394,57 +394,113 @@ $(document).ready(function () {
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  ok<span class="op">=</span>cv.imwrite(imagePath, theImage)</span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span>(<span class="st">&quot;</span><span class="ch">\n\n</span><span class="st">![](&quot;</span><span class="op">+</span>imagePath<span class="op">+</span><span class="st">&quot;)</span><span class="ch">\n\n</span><span class="st">&quot;</span>)</span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span>(<span class="st">&quot;</span><span class="ch">\n\n</span><span class="st">View full image [&quot;</span><span class="op">+</span>imagePath<span class="op">+</span><span class="st">&quot;](&quot;</span><span class="op">+</span>imagePath<span class="op">+</span><span class="st">&quot;)</span><span class="ch">\n\n</span><span class="st">&quot;</span>)</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>imageDir<span class="op">=</span><span class="st">&#39;_images/&#39;</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> imageFileStub <span class="kw">in</span> os.listdir(imageDir):</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  fileWithoutExt<span class="op">=</span>os.path.splitext(imageFileStub)[<span class="dv">0</span>]</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span>(<span class="st">&quot;## &quot;</span><span class="op">+</span>fileWithoutExt<span class="op">+</span><span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  outpath<span class="op">=</span><span class="st">&quot;procimage/&quot;</span><span class="op">+</span>fileWithoutExt<span class="op">+</span><span class="st">&quot;/&quot;</span></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  os.makedirs(outpath, exist_ok <span class="op">=</span> <span class="va">True</span>)</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  image_gray <span class="op">=</span> cv.imread(imageDir<span class="op">+</span>imageFileStub,cv.IMREAD_ANYDEPTH )</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  img_gray_255<span class="op">=</span>np.uint8(PercentileScaledImage(image_gray,lowerPerc<span class="op">=</span><span class="fl">0.1</span>,upperPerc<span class="op">=</span><span class="fl">99.9</span>,maxVal<span class="op">=</span><span class="dv">255</span>,invert<span class="op">=</span><span class="va">False</span>))</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> SavePlotAndMarkdown(imagePath,descript):</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span>(<span class="st">&quot;</span><span class="ch">\n\n</span><span class="st">&quot;</span><span class="op">+</span>descript<span class="op">+</span><span class="st">&quot;</span><span class="ch">\n\n</span><span class="st">&quot;</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  plt.savefig(imagePath)<span class="op">;</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span>(<span class="st">&quot;</span><span class="ch">\n\n</span><span class="st">![](&quot;</span><span class="op">+</span>imagePath<span class="op">+</span><span class="st">&quot;)</span><span class="ch">\n\n</span><span class="st">&quot;</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span>(<span class="st">&quot;</span><span class="ch">\n\n</span><span class="st">View full image [&quot;</span><span class="op">+</span>imagePath<span class="op">+</span><span class="st">&quot;](&quot;</span><span class="op">+</span>imagePath<span class="op">+</span><span class="st">&quot;)</span><span class="ch">\n\n</span><span class="st">&quot;</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> CompareSurfaces(img1,desc1,img2,desc2,TL<span class="op">=</span>(<span class="dv">0</span>,<span class="dv">0</span>),BR<span class="op">=</span>(<span class="dv">100</span>,<span class="dv">100</span>)):</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  subImage1 <span class="op">=</span> img1[TL[<span class="dv">1</span>]:BR[<span class="dv">1</span>],TL[<span class="dv">0</span>]:BR[<span class="dv">0</span>]]</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  subImage2 <span class="op">=</span> img2[TL[<span class="dv">1</span>]:BR[<span class="dv">1</span>],TL[<span class="dv">0</span>]:BR[<span class="dv">0</span>]]</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  plotMin<span class="op">=</span>np.<span class="bu">min</span>((np.<span class="bu">min</span>(subImage1),np.<span class="bu">min</span>(subImage2)))</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  plotMax<span class="op">=</span>np.<span class="bu">max</span>((np.<span class="bu">max</span>(subImage1),np.<span class="bu">max</span>(subImage2)))</span>
 <span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  filtered_image <span class="op">=</span> gaussian(image_gray, <span class="dv">1</span>,preserve_range<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  filtered_image <span class="op">=</span> gaussian(filtered_image,<span class="dv">2</span>,preserve_range<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  filtered_image <span class="op">=</span> gaussian(filtered_image,<span class="dv">3</span>,preserve_range<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>  filtered_image <span class="op">=</span> gaussian(filtered_image,<span class="dv">4</span>,preserve_range<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>  filtered_image <span class="op">=</span> gaussian(filtered_image,<span class="dv">5</span>,preserve_range<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>  filtered_image <span class="op">=</span> gaussian(filtered_image,<span class="dv">6</span>,preserve_range<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>  filtered_image <span class="op">=</span> gaussian(filtered_image,<span class="dv">7</span>,preserve_range<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>  filtered_image <span class="op">=</span> gaussian(filtered_image,<span class="dv">8</span>,preserve_range<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>  img_gray_255_1<span class="op">=</span>np.uint8(PercentileScaledImage(filtered_image,lowerPerc<span class="op">=</span><span class="fl">0.1</span>,upperPerc<span class="op">=</span><span class="fl">99.9</span>,maxVal<span class="op">=</span><span class="dv">255</span>,invert<span class="op">=</span><span class="va">False</span>))</span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>  diff_image<span class="op">=</span>image_gray<span class="op">-</span>filtered_image</span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>  img_gray_255_2<span class="op">=</span>np.uint8(PercentileScaledImageToImage(diff_image,filtered_image,lowerPerc<span class="op">=</span><span class="fl">0.1</span>,upperPerc<span class="op">=</span><span class="fl">99.9</span>,maxVal<span class="op">=</span><span class="dv">255</span>,invert<span class="op">=</span><span class="va">False</span>))</span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>  SaveImageAndMarkdown(outpath<span class="op">+</span>fileWithoutExt<span class="op">+</span> <span class="st">&quot; Input Image.png&quot;</span>,<span class="dv">255</span><span class="op">-</span>img_gray_255,<span class="st">&quot;### Input Image&quot;</span>)</span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>  SaveImageAndMarkdown(outpath<span class="op">+</span>fileWithoutExt<span class="op">+</span> <span class="st">&quot; Filtered Image.png&quot;</span>,<span class="dv">255</span><span class="op">-</span>img_gray_255_1,<span class="st">&quot;### Filtered Image&quot;</span>)</span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>  SaveImageAndMarkdown(outpath<span class="op">+</span>fileWithoutExt<span class="op">+</span> <span class="st">&quot; Diff Image.png&quot;</span>,<span class="dv">255</span><span class="op">-</span>img_gray_255_2,<span class="st">&quot;### Difference Image&quot;</span>)</span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a> </span>
-<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>  img1<span class="op">=</span><span class="dv">255</span><span class="op">-</span>img_gray_255</span>
-<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>  img2<span class="op">=</span><span class="dv">255</span><span class="op">-</span>img_gray_255_1</span>
-<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>  img3<span class="op">=</span><span class="dv">255</span><span class="op">-</span>img_gray_255_2</span>
-<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>  overColour <span class="op">=</span> cv.merge((img3,img1,img3))</span>
-<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>  ok<span class="op">=</span>cv.imwrite(outpath<span class="op">+</span>fileWithoutExt<span class="op">+</span><span class="st">&#39; Overlay&#39;</span><span class="op">+</span> <span class="st">&quot; ChainFiltered.png&quot;</span>, overColour)</span>
-<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>  ok<span class="op">=</span>cv.imwrite(outpath<span class="op">+</span>fileWithoutExt<span class="op">+</span> <span class="st">&quot; ChainFiltered16.tif&quot;</span>, np.uint16(np.clip(diff_image,<span class="dv">0</span>,<span class="dv">65535</span>)))</span>
-<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>  SaveImageAndMarkdown(outpath<span class="op">+</span>fileWithoutExt<span class="op">+</span><span class="st">&#39; Overlay&#39;</span><span class="op">+</span> <span class="st">&quot; ChainFiltered.png&quot;</span>,overColour,<span class="st">&quot;### overlay&quot;</span>)</span>
-<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a> <span class="co"># limage=filtered_image</span></span>
-<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a> <span class="co"># lower=np.min(limage)</span></span>
-<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a> <span class="co"># upper=np.max(limage)</span></span>
-<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a><span class="co">#  greyFac_65535=65000/(upper-lower) # don&#39;t quite use all the levels</span></span>
-<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a> <span class="co"># limg_gray_65535=np.uint16(np.clip(np.floor(greyFac*(limage-lower)),0,65535))</span></span>
-<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a><span class="co">#  ok=cv.imwrite(outpath+fileWithoutExt+ &quot; ChainFilteredRange.tif&quot;, np.uint16(limg_gray_65535))</span></span>
-<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>  </span></code></pre></div>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  <span class="co"># create the x and y coordinate arrays (here we just use pixel indices)</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  xx, yy <span class="op">=</span> np.mgrid[<span class="dv">0</span>:subImage1.shape[<span class="dv">0</span>], <span class="dv">0</span>:subImage1.shape[<span class="dv">1</span>]]</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>  <span class="co"># set up a figure twice as wide as it is tall</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>  fig <span class="op">=</span> plt.figure(figsize<span class="op">=</span>plt.figaspect(<span class="fl">0.5</span>))</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>  <span class="co">#===============</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>  <span class="co">#  First subplot</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>  <span class="co">#===============</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>  <span class="co"># set up the axes for the first plot</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>  ax <span class="op">=</span> fig.add_subplot(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">1</span>, projection<span class="op">=</span><span class="st">&#39;3d&#39;</span>)</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>  ax.set_title(desc1)</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>  surf <span class="op">=</span> ax.plot_surface(xx, yy, subImage1, rstride<span class="op">=</span><span class="dv">1</span>, cstride<span class="op">=</span><span class="dv">1</span>, cmap<span class="op">=</span>plt.cm.jet,</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>                       linewidth<span class="op">=</span><span class="dv">0</span>, antialiased<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>  ax.set_zlim(plotMin, plotMax)</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>  <span class="co">#fig.colorbar(surf, shrink=0.5, aspect=10)</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>  <span class="co">#===============</span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Second subplot</span></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>  <span class="co">#===============</span></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>  <span class="co"># set up the axes for the second plot</span></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>  ax <span class="op">=</span> fig.add_subplot(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">2</span>, projection<span class="op">=</span><span class="st">&#39;3d&#39;</span>)</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>  ax.set_title(desc2)</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>  surf <span class="op">=</span> ax.plot_surface(xx, yy, subImage2, rstride<span class="op">=</span><span class="dv">1</span>, cstride<span class="op">=</span><span class="dv">1</span>, cmap<span class="op">=</span>plt.cm.jet,</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>                       linewidth<span class="op">=</span><span class="dv">0</span>, antialiased<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>  ax.set_zlim(plotMin, plotMax)</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>imageDir<span class="op">=</span><span class="st">&#39;_images/&#39;</span></span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> imageFileStub <span class="kw">in</span> os.listdir(imageDir):</span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>  fileWithoutExt<span class="op">=</span>os.path.splitext(imageFileStub)[<span class="dv">0</span>]</span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span>(<span class="st">&quot;## &quot;</span><span class="op">+</span>fileWithoutExt<span class="op">+</span><span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>  outpath<span class="op">=</span><span class="st">&quot;procimage/&quot;</span><span class="op">+</span>fileWithoutExt<span class="op">+</span><span class="st">&quot;/&quot;</span></span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>  os.makedirs(outpath, exist_ok <span class="op">=</span> <span class="va">True</span>)</span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>  image_gray <span class="op">=</span> cv.imread(imageDir<span class="op">+</span>imageFileStub,cv.IMREAD_ANYDEPTH )</span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>  img_gray_255<span class="op">=</span>np.uint8(PercentileScaledImage(image_gray,lowerPerc<span class="op">=</span><span class="fl">0.1</span>,upperPerc<span class="op">=</span><span class="fl">99.9</span>,maxVal<span class="op">=</span><span class="dv">255</span>,invert<span class="op">=</span><span class="va">False</span>))</span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>  filtered_image <span class="op">=</span> gaussian(image_gray, <span class="dv">1</span>,preserve_range<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>  filtered_image <span class="op">=</span> gaussian(filtered_image,<span class="dv">2</span>,preserve_range<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>  filtered_image <span class="op">=</span> gaussian(filtered_image,<span class="dv">3</span>,preserve_range<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a>  filtered_image <span class="op">=</span> gaussian(filtered_image,<span class="dv">4</span>,preserve_range<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a>  filtered_image <span class="op">=</span> gaussian(filtered_image,<span class="dv">5</span>,preserve_range<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a>  filtered_image <span class="op">=</span> gaussian(filtered_image,<span class="dv">6</span>,preserve_range<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>  filtered_image <span class="op">=</span> gaussian(filtered_image,<span class="dv">7</span>,preserve_range<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a>  filtered_image <span class="op">=</span> gaussian(filtered_image,<span class="dv">8</span>,preserve_range<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a> <span class="co"># filtered_image=np.uint16(np.clip(np.round(filtered_image),0,65535))</span></span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>  img_gray_255_1<span class="op">=</span>np.uint8(PercentileScaledImage(filtered_image,lowerPerc<span class="op">=</span><span class="fl">0.1</span>,upperPerc<span class="op">=</span><span class="fl">99.9</span>,maxVal<span class="op">=</span><span class="dv">255</span>,invert<span class="op">=</span><span class="va">False</span>))</span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>  diff_image<span class="op">=</span>image_gray<span class="op">-</span>filtered_image</span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a>  diff_image <span class="op">=</span> gaussian(diff_image, <span class="dv">1</span>,preserve_range<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a>  img_gray_255_2<span class="op">=</span>np.uint8(PercentileScaledImageToImage(diff_image,filtered_image,lowerPerc<span class="op">=</span><span class="fl">0.1</span>,upperPerc<span class="op">=</span><span class="fl">99.9</span>,maxVal<span class="op">=</span><span class="dv">255</span>,invert<span class="op">=</span><span class="va">False</span>))</span>
+<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a>  SaveImageAndMarkdown(outpath<span class="op">+</span>fileWithoutExt<span class="op">+</span> <span class="st">&quot; Input Image.png&quot;</span>,<span class="dv">255</span><span class="op">-</span>img_gray_255,<span class="st">&quot;### Input Image&quot;</span>)</span>
+<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a>  SaveImageAndMarkdown(outpath<span class="op">+</span>fileWithoutExt<span class="op">+</span> <span class="st">&quot; Filtered Image.png&quot;</span>,<span class="dv">255</span><span class="op">-</span>img_gray_255_1,<span class="st">&quot;### Filtered Image&quot;</span>)</span>
+<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a>  SaveImageAndMarkdown(outpath<span class="op">+</span>fileWithoutExt<span class="op">+</span> <span class="st">&quot; Diff Image.png&quot;</span>,<span class="dv">255</span><span class="op">-</span>img_gray_255_2,<span class="st">&quot;### Difference Image&quot;</span>)</span>
+<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a>  img1<span class="op">=</span><span class="dv">255</span><span class="op">-</span>img_gray_255</span>
+<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a>  img2<span class="op">=</span><span class="dv">255</span><span class="op">-</span>img_gray_255_1</span>
+<span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a>  img3<span class="op">=</span><span class="dv">255</span><span class="op">-</span>img_gray_255_2</span>
+<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a>  overColour <span class="op">=</span> cv.merge((img3,img1,img3))</span>
+<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a>  ok<span class="op">=</span>cv.imwrite(outpath<span class="op">+</span>fileWithoutExt<span class="op">+</span><span class="st">&#39; Overlay&#39;</span><span class="op">+</span> <span class="st">&quot; ChainFiltered.png&quot;</span>, overColour)</span>
+<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a>  ok<span class="op">=</span>cv.imwrite(outpath<span class="op">+</span>fileWithoutExt<span class="op">+</span> <span class="st">&quot; ChainFiltered16.tif&quot;</span>, np.uint16(np.clip(diff_image,<span class="dv">0</span>,<span class="dv">65535</span>)))</span>
+<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a>  SaveImageAndMarkdown(outpath<span class="op">+</span>fileWithoutExt<span class="op">+</span><span class="st">&#39; Overlay&#39;</span><span class="op">+</span> <span class="st">&quot; ChainFiltered.png&quot;</span>,overColour,<span class="st">&quot;### overlay&quot;</span>)</span>
+<span id="cb2-96"><a href="#cb2-96" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-97"><a href="#cb2-97" aria-hidden="true" tabindex="-1"></a>  subPlots<span class="op">=</span>[</span>
+<span id="cb2-98"><a href="#cb2-98" aria-hidden="true" tabindex="-1"></a>    [(<span class="dv">109</span>,<span class="dv">4</span>),(<span class="dv">249</span>,<span class="dv">128</span>)],</span>
+<span id="cb2-99"><a href="#cb2-99" aria-hidden="true" tabindex="-1"></a>    [(<span class="dv">724</span>,<span class="dv">775</span>),(<span class="dv">836</span>,<span class="dv">871</span>)],</span>
+<span id="cb2-100"><a href="#cb2-100" aria-hidden="true" tabindex="-1"></a>    [(<span class="dv">700</span>,<span class="dv">700</span>),(<span class="dv">1400</span>,<span class="dv">1400</span>)]]</span>
+<span id="cb2-101"><a href="#cb2-101" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-102"><a href="#cb2-102" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> subPlot <span class="kw">in</span> subPlots:</span>
+<span id="cb2-103"><a href="#cb2-103" aria-hidden="true" tabindex="-1"></a>    CompareSurfaces(image_gray,<span class="st">&quot;Raw&quot;</span>,diff_image,<span class="st">&quot;Filtered&quot;</span>,TL<span class="op">=</span>subPlot[<span class="dv">0</span>],BR<span class="op">=</span>subPlot[<span class="dv">1</span>])</span>
+<span id="cb2-104"><a href="#cb2-104" aria-hidden="true" tabindex="-1"></a>    subAreaString<span class="op">=</span><span class="st">&quot;TL&quot;</span><span class="op">+</span><span class="bu">str</span>(subPlot[<span class="dv">0</span>][<span class="dv">0</span>])<span class="op">+</span><span class="st">&quot;_&quot;</span><span class="op">+</span><span class="bu">str</span>(subPlot[<span class="dv">0</span>][<span class="dv">1</span>])<span class="op">+</span><span class="st">&quot;BR&quot;</span><span class="op">+</span><span class="bu">str</span>(subPlot[<span class="dv">1</span>][<span class="dv">0</span>])<span class="op">+</span><span class="st">&quot;_&quot;</span><span class="op">+</span><span class="bu">str</span>(subPlot[<span class="dv">1</span>][<span class="dv">1</span>])</span>
+<span id="cb2-105"><a href="#cb2-105" aria-hidden="true" tabindex="-1"></a>    SavePlotAndMarkdown(outpath<span class="op">+</span>fileWithoutExt<span class="op">+</span><span class="st">&quot; &quot;</span><span class="op">+</span>subAreaString<span class="op">+</span><span class="st">&quot;3D.png&quot;</span>,<span class="st">&quot;#### sub area TL &quot;</span><span class="op">+</span><span class="bu">str</span>(subPlot[<span class="dv">0</span>])<span class="op">+</span><span class="st">&quot; BR &quot;</span><span class="op">+</span><span class="bu">str</span>(subPlot[<span class="dv">1</span>]))</span>
+<span id="cb2-106"><a href="#cb2-106" aria-hidden="true" tabindex="-1"></a>    plt.close()</span>
+<span id="cb2-107"><a href="#cb2-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-108"><a href="#cb2-108" aria-hidden="true" tabindex="-1"></a> <span class="co"># limage=filtered_image</span></span>
+<span id="cb2-109"><a href="#cb2-109" aria-hidden="true" tabindex="-1"></a> <span class="co"># lower=np.min(limage)</span></span>
+<span id="cb2-110"><a href="#cb2-110" aria-hidden="true" tabindex="-1"></a> <span class="co"># upper=np.max(limage)</span></span>
+<span id="cb2-111"><a href="#cb2-111" aria-hidden="true" tabindex="-1"></a><span class="co">#  greyFac_65535=65000/(upper-lower) # don&#39;t quite use all the levels</span></span>
+<span id="cb2-112"><a href="#cb2-112" aria-hidden="true" tabindex="-1"></a> <span class="co"># limg_gray_65535=np.uint16(np.clip(np.floor(greyFac*(limage-lower)),0,65535))</span></span>
+<span id="cb2-113"><a href="#cb2-113" aria-hidden="true" tabindex="-1"></a><span class="co">#  ok=cv.imwrite(outpath+fileWithoutExt+ &quot; ChainFilteredRange.tif&quot;, np.uint16(limg_gray_65535))</span></span>
+<span id="cb2-114"><a href="#cb2-114" aria-hidden="true" tabindex="-1"></a>  </span></code></pre></div>
 <div id="fc3344_lobe_lanea_0stage20488" class="section level2">
 <h2>FC3344_LOBE_LANEA_0–Stage20–488</h2>
 <div id="input-image" class="section level3">
@@ -466,6 +522,21 @@ $(document).ready(function () {
 <h3>overlay</h3>
 <p><img src="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488%20Overlay%20ChainFiltered.png" /></p>
 <p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488%20Overlay%20ChainFiltered.png">procimage/FC3344_LOBE_LANEA_0–Stage20–488/FC3344_LOBE_LANEA_0–Stage20–488 Overlay ChainFiltered.png</a></p>
+<div id="sub-area-tl-109-4-br-249-128" class="section level4">
+<h4>sub area TL (109, 4) BR (249, 128)</h4>
+<p><img src="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488%20TL109_4BR249_1283D.png" /></p>
+<p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488%20TL109_4BR249_1283D.png">procimage/FC3344_LOBE_LANEA_0–Stage20–488/FC3344_LOBE_LANEA_0–Stage20–488 TL109_4BR249_1283D.png</a></p>
+</div>
+<div id="sub-area-tl-724-775-br-836-871" class="section level4">
+<h4>sub area TL (724, 775) BR (836, 871)</h4>
+<p><img src="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488%20TL724_775BR836_8713D.png" /></p>
+<p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488%20TL724_775BR836_8713D.png">procimage/FC3344_LOBE_LANEA_0–Stage20–488/FC3344_LOBE_LANEA_0–Stage20–488 TL724_775BR836_8713D.png</a></p>
+</div>
+<div id="sub-area-tl-700-700-br-1400-1400" class="section level4">
+<h4>sub area TL (700, 700) BR (1400, 1400)</h4>
+<p><img src="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488%20TL700_700BR1400_14003D.png" /></p>
+<p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488%20TL700_700BR1400_14003D.png">procimage/FC3344_LOBE_LANEA_0–Stage20–488/FC3344_LOBE_LANEA_0–Stage20–488 TL700_700BR1400_14003D.png</a></p>
+</div>
 </div>
 </div>
 <div id="fc3344_lobe_lanea_0stage20647" class="section level2">
@@ -489,6 +560,21 @@ $(document).ready(function () {
 <h3>overlay</h3>
 <p><img src="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647%20Overlay%20ChainFiltered.png" /></p>
 <p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647%20Overlay%20ChainFiltered.png">procimage/FC3344_LOBE_LANEA_0–Stage20–647/FC3344_LOBE_LANEA_0–Stage20–647 Overlay ChainFiltered.png</a></p>
+<div id="sub-area-tl-109-4-br-249-128-1" class="section level4">
+<h4>sub area TL (109, 4) BR (249, 128)</h4>
+<p><img src="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647%20TL109_4BR249_1283D.png" /></p>
+<p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647%20TL109_4BR249_1283D.png">procimage/FC3344_LOBE_LANEA_0–Stage20–647/FC3344_LOBE_LANEA_0–Stage20–647 TL109_4BR249_1283D.png</a></p>
+</div>
+<div id="sub-area-tl-724-775-br-836-871-1" class="section level4">
+<h4>sub area TL (724, 775) BR (836, 871)</h4>
+<p><img src="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647%20TL724_775BR836_8713D.png" /></p>
+<p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647%20TL724_775BR836_8713D.png">procimage/FC3344_LOBE_LANEA_0–Stage20–647/FC3344_LOBE_LANEA_0–Stage20–647 TL724_775BR836_8713D.png</a></p>
+</div>
+<div id="sub-area-tl-700-700-br-1400-1400-1" class="section level4">
+<h4>sub area TL (700, 700) BR (1400, 1400)</h4>
+<p><img src="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647%20TL700_700BR1400_14003D.png" /></p>
+<p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647%20TL700_700BR1400_14003D.png">procimage/FC3344_LOBE_LANEA_0–Stage20–647/FC3344_LOBE_LANEA_0–Stage20–647 TL700_700BR1400_14003D.png</a></p>
+</div>
 </div>
 </div>
 <div id="fc4447_lobe_lanec_0stage08488" class="section level2">
@@ -512,6 +598,21 @@ $(document).ready(function () {
 <h3>overlay</h3>
 <p><img src="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488%20Overlay%20ChainFiltered.png" /></p>
 <p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488%20Overlay%20ChainFiltered.png">procimage/FC4447_LOBE_LANEC_0–Stage08–488/FC4447_LOBE_LANEC_0–Stage08–488 Overlay ChainFiltered.png</a></p>
+<div id="sub-area-tl-109-4-br-249-128-2" class="section level4">
+<h4>sub area TL (109, 4) BR (249, 128)</h4>
+<p><img src="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488%20TL109_4BR249_1283D.png" /></p>
+<p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488%20TL109_4BR249_1283D.png">procimage/FC4447_LOBE_LANEC_0–Stage08–488/FC4447_LOBE_LANEC_0–Stage08–488 TL109_4BR249_1283D.png</a></p>
+</div>
+<div id="sub-area-tl-724-775-br-836-871-2" class="section level4">
+<h4>sub area TL (724, 775) BR (836, 871)</h4>
+<p><img src="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488%20TL724_775BR836_8713D.png" /></p>
+<p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488%20TL724_775BR836_8713D.png">procimage/FC4447_LOBE_LANEC_0–Stage08–488/FC4447_LOBE_LANEC_0–Stage08–488 TL724_775BR836_8713D.png</a></p>
+</div>
+<div id="sub-area-tl-700-700-br-1400-1400-2" class="section level4">
+<h4>sub area TL (700, 700) BR (1400, 1400)</h4>
+<p><img src="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488%20TL700_700BR1400_14003D.png" /></p>
+<p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488%20TL700_700BR1400_14003D.png">procimage/FC4447_LOBE_LANEC_0–Stage08–488/FC4447_LOBE_LANEC_0–Stage08–488 TL700_700BR1400_14003D.png</a></p>
+</div>
 </div>
 </div>
 <div id="fc4447_lobe_lanec_0stage08647" class="section level2">
@@ -535,6 +636,21 @@ $(document).ready(function () {
 <h3>overlay</h3>
 <p><img src="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647%20Overlay%20ChainFiltered.png" /></p>
 <p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647%20Overlay%20ChainFiltered.png">procimage/FC4447_LOBE_LANEC_0–Stage08–647/FC4447_LOBE_LANEC_0–Stage08–647 Overlay ChainFiltered.png</a></p>
+<div id="sub-area-tl-109-4-br-249-128-3" class="section level4">
+<h4>sub area TL (109, 4) BR (249, 128)</h4>
+<p><img src="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647%20TL109_4BR249_1283D.png" /></p>
+<p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647%20TL109_4BR249_1283D.png">procimage/FC4447_LOBE_LANEC_0–Stage08–647/FC4447_LOBE_LANEC_0–Stage08–647 TL109_4BR249_1283D.png</a></p>
+</div>
+<div id="sub-area-tl-724-775-br-836-871-3" class="section level4">
+<h4>sub area TL (724, 775) BR (836, 871)</h4>
+<p><img src="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647%20TL724_775BR836_8713D.png" /></p>
+<p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647%20TL724_775BR836_8713D.png">procimage/FC4447_LOBE_LANEC_0–Stage08–647/FC4447_LOBE_LANEC_0–Stage08–647 TL724_775BR836_8713D.png</a></p>
+</div>
+<div id="sub-area-tl-700-700-br-1400-1400-3" class="section level4">
+<h4>sub area TL (700, 700) BR (1400, 1400)</h4>
+<p><img src="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647%20TL700_700BR1400_14003D.png" /></p>
+<p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647%20TL700_700BR1400_14003D.png">procimage/FC4447_LOBE_LANEC_0–Stage08–647/FC4447_LOBE_LANEC_0–Stage08–647 TL700_700BR1400_14003D.png</a></p>
+</div>
 </div>
 </div>
 <div id="fc4448_lobe_lanec_0stage08488" class="section level2">
@@ -558,6 +674,21 @@ $(document).ready(function () {
 <h3>overlay</h3>
 <p><img src="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488%20Overlay%20ChainFiltered.png" /></p>
 <p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488%20Overlay%20ChainFiltered.png">procimage/FC4448_LOBE_LANEC_0–Stage08–488/FC4448_LOBE_LANEC_0–Stage08–488 Overlay ChainFiltered.png</a></p>
+<div id="sub-area-tl-109-4-br-249-128-4" class="section level4">
+<h4>sub area TL (109, 4) BR (249, 128)</h4>
+<p><img src="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488%20TL109_4BR249_1283D.png" /></p>
+<p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488%20TL109_4BR249_1283D.png">procimage/FC4448_LOBE_LANEC_0–Stage08–488/FC4448_LOBE_LANEC_0–Stage08–488 TL109_4BR249_1283D.png</a></p>
+</div>
+<div id="sub-area-tl-724-775-br-836-871-4" class="section level4">
+<h4>sub area TL (724, 775) BR (836, 871)</h4>
+<p><img src="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488%20TL724_775BR836_8713D.png" /></p>
+<p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488%20TL724_775BR836_8713D.png">procimage/FC4448_LOBE_LANEC_0–Stage08–488/FC4448_LOBE_LANEC_0–Stage08–488 TL724_775BR836_8713D.png</a></p>
+</div>
+<div id="sub-area-tl-700-700-br-1400-1400-4" class="section level4">
+<h4>sub area TL (700, 700) BR (1400, 1400)</h4>
+<p><img src="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488%20TL700_700BR1400_14003D.png" /></p>
+<p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488%20TL700_700BR1400_14003D.png">procimage/FC4448_LOBE_LANEC_0–Stage08–488/FC4448_LOBE_LANEC_0–Stage08–488 TL700_700BR1400_14003D.png</a></p>
+</div>
 </div>
 </div>
 <div id="fc4448_lobe_lanec_0stage08647" class="section level2">
@@ -581,6 +712,21 @@ $(document).ready(function () {
 <h3>overlay</h3>
 <p><img src="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647%20Overlay%20ChainFiltered.png" /></p>
 <p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647%20Overlay%20ChainFiltered.png">procimage/FC4448_LOBE_LANEC_0–Stage08–647/FC4448_LOBE_LANEC_0–Stage08–647 Overlay ChainFiltered.png</a></p>
+<div id="sub-area-tl-109-4-br-249-128-5" class="section level4">
+<h4>sub area TL (109, 4) BR (249, 128)</h4>
+<p><img src="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647%20TL109_4BR249_1283D.png" /></p>
+<p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647%20TL109_4BR249_1283D.png">procimage/FC4448_LOBE_LANEC_0–Stage08–647/FC4448_LOBE_LANEC_0–Stage08–647 TL109_4BR249_1283D.png</a></p>
+</div>
+<div id="sub-area-tl-724-775-br-836-871-5" class="section level4">
+<h4>sub area TL (724, 775) BR (836, 871)</h4>
+<p><img src="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647%20TL724_775BR836_8713D.png" /></p>
+<p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647%20TL724_775BR836_8713D.png">procimage/FC4448_LOBE_LANEC_0–Stage08–647/FC4448_LOBE_LANEC_0–Stage08–647 TL724_775BR836_8713D.png</a></p>
+</div>
+<div id="sub-area-tl-700-700-br-1400-1400-5" class="section level4">
+<h4>sub area TL (700, 700) BR (1400, 1400)</h4>
+<p><img src="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647%20TL700_700BR1400_14003D.png" /></p>
+<p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647%20TL700_700BR1400_14003D.png">procimage/FC4448_LOBE_LANEC_0–Stage08–647/FC4448_LOBE_LANEC_0–Stage08–647 TL700_700BR1400_14003D.png</a></p>
+</div>
 </div>
 </div>
 <div id="fc4573_lobe01_lanea_0stage08488" class="section level2">
@@ -604,6 +750,21 @@ $(document).ready(function () {
 <h3>overlay</h3>
 <p><img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488%20Overlay%20ChainFiltered.png" /></p>
 <p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488%20Overlay%20ChainFiltered.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–488/FC4573_LOBE01_LANEA_0–Stage08–488 Overlay ChainFiltered.png</a></p>
+<div id="sub-area-tl-109-4-br-249-128-6" class="section level4">
+<h4>sub area TL (109, 4) BR (249, 128)</h4>
+<p><img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488%20TL109_4BR249_1283D.png" /></p>
+<p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488%20TL109_4BR249_1283D.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–488/FC4573_LOBE01_LANEA_0–Stage08–488 TL109_4BR249_1283D.png</a></p>
+</div>
+<div id="sub-area-tl-724-775-br-836-871-6" class="section level4">
+<h4>sub area TL (724, 775) BR (836, 871)</h4>
+<p><img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488%20TL724_775BR836_8713D.png" /></p>
+<p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488%20TL724_775BR836_8713D.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–488/FC4573_LOBE01_LANEA_0–Stage08–488 TL724_775BR836_8713D.png</a></p>
+</div>
+<div id="sub-area-tl-700-700-br-1400-1400-6" class="section level4">
+<h4>sub area TL (700, 700) BR (1400, 1400)</h4>
+<p><img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488%20TL700_700BR1400_14003D.png" /></p>
+<p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488%20TL700_700BR1400_14003D.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–488/FC4573_LOBE01_LANEA_0–Stage08–488 TL700_700BR1400_14003D.png</a></p>
+</div>
 </div>
 </div>
 <div id="fc4573_lobe01_lanea_0stage08647" class="section level2">
@@ -627,6 +788,21 @@ $(document).ready(function () {
 <h3>overlay</h3>
 <p><img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647%20Overlay%20ChainFiltered.png" /></p>
 <p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647%20Overlay%20ChainFiltered.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–647/FC4573_LOBE01_LANEA_0–Stage08–647 Overlay ChainFiltered.png</a></p>
+<div id="sub-area-tl-109-4-br-249-128-7" class="section level4">
+<h4>sub area TL (109, 4) BR (249, 128)</h4>
+<p><img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647%20TL109_4BR249_1283D.png" /></p>
+<p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647%20TL109_4BR249_1283D.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–647/FC4573_LOBE01_LANEA_0–Stage08–647 TL109_4BR249_1283D.png</a></p>
+</div>
+<div id="sub-area-tl-724-775-br-836-871-7" class="section level4">
+<h4>sub area TL (724, 775) BR (836, 871)</h4>
+<p><img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647%20TL724_775BR836_8713D.png" /></p>
+<p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647%20TL724_775BR836_8713D.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–647/FC4573_LOBE01_LANEA_0–Stage08–647 TL724_775BR836_8713D.png</a></p>
+</div>
+<div id="sub-area-tl-700-700-br-1400-1400-7" class="section level4">
+<h4>sub area TL (700, 700) BR (1400, 1400)</h4>
+<p><img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647%20TL700_700BR1400_14003D.png" /></p>
+<p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647%20TL700_700BR1400_14003D.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–647/FC4573_LOBE01_LANEA_0–Stage08–647 TL700_700BR1400_14003D.png</a></p>
+</div>
 </div>
 </div>
 <div id="fc4575_lobe01_laneb_0stage17488" class="section level2">
@@ -650,6 +826,21 @@ $(document).ready(function () {
 <h3>overlay</h3>
 <p><img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488%20Overlay%20ChainFiltered.png" /></p>
 <p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488%20Overlay%20ChainFiltered.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–488/FC4575_LOBE01_LANEB_0–Stage17–488 Overlay ChainFiltered.png</a></p>
+<div id="sub-area-tl-109-4-br-249-128-8" class="section level4">
+<h4>sub area TL (109, 4) BR (249, 128)</h4>
+<p><img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488%20TL109_4BR249_1283D.png" /></p>
+<p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488%20TL109_4BR249_1283D.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–488/FC4575_LOBE01_LANEB_0–Stage17–488 TL109_4BR249_1283D.png</a></p>
+</div>
+<div id="sub-area-tl-724-775-br-836-871-8" class="section level4">
+<h4>sub area TL (724, 775) BR (836, 871)</h4>
+<p><img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488%20TL724_775BR836_8713D.png" /></p>
+<p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488%20TL724_775BR836_8713D.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–488/FC4575_LOBE01_LANEB_0–Stage17–488 TL724_775BR836_8713D.png</a></p>
+</div>
+<div id="sub-area-tl-700-700-br-1400-1400-8" class="section level4">
+<h4>sub area TL (700, 700) BR (1400, 1400)</h4>
+<p><img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488%20TL700_700BR1400_14003D.png" /></p>
+<p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488%20TL700_700BR1400_14003D.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–488/FC4575_LOBE01_LANEB_0–Stage17–488 TL700_700BR1400_14003D.png</a></p>
+</div>
 </div>
 </div>
 <div id="fc4575_lobe01_laneb_0stage17647" class="section level2">
@@ -673,6 +864,21 @@ $(document).ready(function () {
 <h3>overlay</h3>
 <p><img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647%20Overlay%20ChainFiltered.png" /></p>
 <p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647%20Overlay%20ChainFiltered.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–647/FC4575_LOBE01_LANEB_0–Stage17–647 Overlay ChainFiltered.png</a></p>
+<div id="sub-area-tl-109-4-br-249-128-9" class="section level4">
+<h4>sub area TL (109, 4) BR (249, 128)</h4>
+<p><img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647%20TL109_4BR249_1283D.png" /></p>
+<p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647%20TL109_4BR249_1283D.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–647/FC4575_LOBE01_LANEB_0–Stage17–647 TL109_4BR249_1283D.png</a></p>
+</div>
+<div id="sub-area-tl-724-775-br-836-871-9" class="section level4">
+<h4>sub area TL (724, 775) BR (836, 871)</h4>
+<p><img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647%20TL724_775BR836_8713D.png" /></p>
+<p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647%20TL724_775BR836_8713D.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–647/FC4575_LOBE01_LANEB_0–Stage17–647 TL724_775BR836_8713D.png</a></p>
+</div>
+<div id="sub-area-tl-700-700-br-1400-1400-9" class="section level4">
+<h4>sub area TL (700, 700) BR (1400, 1400)</h4>
+<p><img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647%20TL700_700BR1400_14003D.png" /></p>
+<p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647%20TL700_700BR1400_14003D.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–647/FC4575_LOBE01_LANEB_0–Stage17–647 TL700_700BR1400_14003D.png</a></p>
+</div>
 </div>
 </div>
 <div id="fc4575_lobe02_laneb_0stage17488" class="section level2">
@@ -696,6 +902,21 @@ $(document).ready(function () {
 <h3>overlay</h3>
 <p><img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488%20Overlay%20ChainFiltered.png" /></p>
 <p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488%20Overlay%20ChainFiltered.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–488/FC4575_LOBE02_LANEB_0–Stage17–488 Overlay ChainFiltered.png</a></p>
+<div id="sub-area-tl-109-4-br-249-128-10" class="section level4">
+<h4>sub area TL (109, 4) BR (249, 128)</h4>
+<p><img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488%20TL109_4BR249_1283D.png" /></p>
+<p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488%20TL109_4BR249_1283D.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–488/FC4575_LOBE02_LANEB_0–Stage17–488 TL109_4BR249_1283D.png</a></p>
+</div>
+<div id="sub-area-tl-724-775-br-836-871-10" class="section level4">
+<h4>sub area TL (724, 775) BR (836, 871)</h4>
+<p><img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488%20TL724_775BR836_8713D.png" /></p>
+<p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488%20TL724_775BR836_8713D.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–488/FC4575_LOBE02_LANEB_0–Stage17–488 TL724_775BR836_8713D.png</a></p>
+</div>
+<div id="sub-area-tl-700-700-br-1400-1400-10" class="section level4">
+<h4>sub area TL (700, 700) BR (1400, 1400)</h4>
+<p><img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488%20TL700_700BR1400_14003D.png" /></p>
+<p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488%20TL700_700BR1400_14003D.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–488/FC4575_LOBE02_LANEB_0–Stage17–488 TL700_700BR1400_14003D.png</a></p>
+</div>
 </div>
 </div>
 <div id="fc4575_lobe02_laneb_0stage17647" class="section level2">
@@ -719,6 +940,21 @@ $(document).ready(function () {
 <h3>overlay</h3>
 <p><img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647%20Overlay%20ChainFiltered.png" /></p>
 <p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647%20Overlay%20ChainFiltered.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–647/FC4575_LOBE02_LANEB_0–Stage17–647 Overlay ChainFiltered.png</a></p>
+<div id="sub-area-tl-109-4-br-249-128-11" class="section level4">
+<h4>sub area TL (109, 4) BR (249, 128)</h4>
+<p><img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647%20TL109_4BR249_1283D.png" /></p>
+<p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647%20TL109_4BR249_1283D.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–647/FC4575_LOBE02_LANEB_0–Stage17–647 TL109_4BR249_1283D.png</a></p>
+</div>
+<div id="sub-area-tl-724-775-br-836-871-11" class="section level4">
+<h4>sub area TL (724, 775) BR (836, 871)</h4>
+<p><img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647%20TL724_775BR836_8713D.png" /></p>
+<p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647%20TL724_775BR836_8713D.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–647/FC4575_LOBE02_LANEB_0–Stage17–647 TL724_775BR836_8713D.png</a></p>
+</div>
+<div id="sub-area-tl-700-700-br-1400-1400-11" class="section level4">
+<h4>sub area TL (700, 700) BR (1400, 1400)</h4>
+<p><img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647%20TL700_700BR1400_14003D.png" /></p>
+<p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647%20TL700_700BR1400_14003D.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–647/FC4575_LOBE02_LANEB_0–Stage17–647 TL700_700BR1400_14003D.png</a></p>
+</div>
 </div>
 </div>
 <div id="fc4899_lobe_01__laneb_0stage08488" class="section level2">
@@ -742,6 +978,21 @@ $(document).ready(function () {
 <h3>overlay</h3>
 <p><img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488%20Overlay%20ChainFiltered.png" /></p>
 <p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488%20Overlay%20ChainFiltered.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–488/FC4899_LOBE_01__LANEB_0–Stage08–488 Overlay ChainFiltered.png</a></p>
+<div id="sub-area-tl-109-4-br-249-128-12" class="section level4">
+<h4>sub area TL (109, 4) BR (249, 128)</h4>
+<p><img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488%20TL109_4BR249_1283D.png" /></p>
+<p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488%20TL109_4BR249_1283D.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–488/FC4899_LOBE_01__LANEB_0–Stage08–488 TL109_4BR249_1283D.png</a></p>
+</div>
+<div id="sub-area-tl-724-775-br-836-871-12" class="section level4">
+<h4>sub area TL (724, 775) BR (836, 871)</h4>
+<p><img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488%20TL724_775BR836_8713D.png" /></p>
+<p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488%20TL724_775BR836_8713D.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–488/FC4899_LOBE_01__LANEB_0–Stage08–488 TL724_775BR836_8713D.png</a></p>
+</div>
+<div id="sub-area-tl-700-700-br-1400-1400-12" class="section level4">
+<h4>sub area TL (700, 700) BR (1400, 1400)</h4>
+<p><img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488%20TL700_700BR1400_14003D.png" /></p>
+<p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488%20TL700_700BR1400_14003D.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–488/FC4899_LOBE_01__LANEB_0–Stage08–488 TL700_700BR1400_14003D.png</a></p>
+</div>
 </div>
 </div>
 <div id="fc4899_lobe_01__laneb_0stage08647" class="section level2">
@@ -765,12 +1016,27 @@ $(document).ready(function () {
 <h3>overlay</h3>
 <p><img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647%20Overlay%20ChainFiltered.png" /></p>
 <p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647%20Overlay%20ChainFiltered.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–647/FC4899_LOBE_01__LANEB_0–Stage08–647 Overlay ChainFiltered.png</a></p>
-<p>Time for this code chunk to run: 32.762 s</p>
+<div id="sub-area-tl-109-4-br-249-128-13" class="section level4">
+<h4>sub area TL (109, 4) BR (249, 128)</h4>
+<p><img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647%20TL109_4BR249_1283D.png" /></p>
+<p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647%20TL109_4BR249_1283D.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–647/FC4899_LOBE_01__LANEB_0–Stage08–647 TL109_4BR249_1283D.png</a></p>
+</div>
+<div id="sub-area-tl-724-775-br-836-871-13" class="section level4">
+<h4>sub area TL (724, 775) BR (836, 871)</h4>
+<p><img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647%20TL724_775BR836_8713D.png" /></p>
+<p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647%20TL724_775BR836_8713D.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–647/FC4899_LOBE_01__LANEB_0–Stage08–647 TL724_775BR836_8713D.png</a></p>
+</div>
+<div id="sub-area-tl-700-700-br-1400-1400-13" class="section level4">
+<h4>sub area TL (700, 700) BR (1400, 1400)</h4>
+<p><img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647%20TL700_700BR1400_14003D.png" /></p>
+<p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647%20TL700_700BR1400_14003D.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–647/FC4899_LOBE_01__LANEB_0–Stage08–647 TL700_700BR1400_14003D.png</a></p>
+<p>Time for this code chunk to run: 6.036 s</p>
+</div>
 </div>
 <div id="script-timing" class="section level3">
 <h3>Script timing</h3>
 <p>Script execution timed for ball park purposes but it will include the report generation sections so will be an over estimate of how long it takes.</p>
-<p>All the processing in this analysis including loading and saving images completed in 33.0384587 seconds.</p>
+<p>All the processing in this analysis including loading and saving images completed in 362.4207195 seconds.</p>
 <p><strong>Machine spec:</strong> Processor Intel(R) Core(TM) i9-9900X CPU @ 3.50GHz, 3504 Mhz, 10 Core(s), 64 GB RAM</p>
 </div>
 </div>
