@@ -284,14 +284,38 @@ $(document).ready(function () {
 
 <p>Most of my work is exploratory analysis or prototyping so I often focus in languages that let me do this and then re-code in a more strict language once the path is found.</p>
 <p>This tend to lead to the use of ‘interpretive and interactive’ languages. The freedom can rapidly lead to issues so I tend to write scripts and execute them.</p>
-<p>I always use an IDE (RStudio) and ‘literate programming’ (I now use <a href="https://rmarkdown.rstudio.com/index.html">Rmarkdown</a> though I used to use Sweave). I think it is pretty much a waste of time using interactive mode apart from almost trivial explorations. It is very easy to get a result whilst exploring the data and then not being able to reproduce it. I always use scripts and rerun them.</p>
+<p>I always use an IDE (RStudio) and ‘literate programming’ (I now use <a href="https://rmarkdown.rstudio.com/index.html">Rmarkdown</a> though I used to use Sweave). RMarkdown allows you to generate multiple formats from the same site with each optimised to the format so html and pdf versions are easy to generate. I think it is pretty much a waste of time using interactive mode apart from almost trivial explorations. It is very easy to get a result whilst exploring the data and then not being able to reproduce it. I always use scripts and rerun them.</p>
 <p>RMarkdown and similar tools have additional benefits of making it easy to document as you go along and also that computational blocks can be cached which helps when you have some long running calculations and you are just tuning graphs etc.</p>
-<p>R base is powerful but a lot of the really value is in the third party packages. This is good and bad as the packages may not be regularly maintained and upgrading even a minor version number of R can suddenly break working code. It can also hit portability as certain machines might have a certain base version and libraries installed that are required to get the results. Extensions have been added that improve this but you usually only notice these when you have a lot of experience in R and have already written lots of scripts aroung the base version.</p>
+<p>R base is powerful but a lot of the really value is in the third party packages. This is good and bad as the packages may not be regularly maintained and upgrading even a minor version number of R can suddenly break working code. It can also hit portability as certain machines might have a certain base version and libraries installed that are required to get the results. Extensions have been added that improve this but you usually only notice these when you have a lot of experience in R and have already written lots of scripts around the base version. To avoid this look at <a href="https://www.tidyverse.org/">tidyverse</a> from the start. Reading <a href="https://r4ds.had.co.nz/">R for Data Science</a> may be advisable too.</p>
+<p>It is informative to look over the RStudio <a href="https://www.rstudio.com/resources/cheatsheets/">cheatsheets</a> to get an overview of the range of available tools and functionality.</p>
+<p>This site was created using RMarkdown in RStudio.</p>
+<p><br><br></p>
+<div id="r-packages-to-look-over" class="section level2">
+<h2>R packages to look over</h2>
+<p><br></p>
+<div id="data-analysis-cleaning-and-machine-learning" class="section level4">
+<h4>Data analysis, cleaning and machine learning</h4>
+<p><a href="http://hbiostat.org/R/rms/">rms</a> “rms is an R package that is a replacement for the Design package. The package accompanies FE Harrell’s book Regression Modeling Strategies. It began in 1991 as the S-Plus Design package.”</p>
+<p><a href="https://topepo.github.io/caret/">caret</a> “The caret package (short for Classification And REgression Training) is a set of functions that attempt to streamline the process for creating predictive models.”</p>
+<p><a href="https://cran.r-project.org/web/packages/mcr/mcr.pdf">mcr</a> “Regression methods to quantify the relation between two measurement methods. In particular it addresses regression problems with errors in both variables and without repeated measurements.”</p>
+<p><a href="https://cran.r-project.org/web/packages/pROC/pROC.pdf">pROC</a> “Tools for visualizing, smoothing and comparing receiver operating characteristic (ROC curves).”</p>
+<p><br></p>
+</div>
+<div id="literate-programing-and-data-website-creation" class="section level4">
+<h4>Literate programing and data website creation</h4>
+<p>These packages support literate programming and can create dynamic and visually pleasing sites easily and with RStudio fit nicely into a simple build process.</p>
+<p><a href="https://yihui.org/knitr/">knitr</a> “Inspired by Sweave, the knitr package was designed to be a transparent engine for dynamic report generation with R”</p>
+<p><a href="https://github.com/juba/rmdformats">rmdformats</a> “This R package provides ready-to-use HTML output formats and templates for RMarkdown documents. The goal is to produce clean documents”out of the box“, with or without the RStudio IDE.”</p>
+<p><a href="https://github.com/hrbrmstr/hrbrthemes">hrbrthemes</a> allows you to tweak fonts and themes for <a href="https://ggplot2.tidyverse.org/">ggplot2</a></p>
+</div>
+</div>
+<div id="python" class="section level2">
+<h2>Python</h2>
 <p>I have started looking into Python as an alternative and there is a lot of similar and sometimes better functionality, especially for image and video processing.</p>
 <p><a href="https://docs.opencv.org/3.4/d6/d00/tutorial_py_root.html"><img src="https://docs.opencv.org/3.4/opencv-logo-small.png" /> OpenCV</a></p>
 <p><a href="https://scikit-image.org/"><img src="https://scikit-image.org/_static/img/logo.png" style="width:20.0%" /></a> and <a href="https://pywavelets.readthedocs.io">PyWavelets - Wavelet Transforms in Python</a></p>
 <p>Python has much better language features and portability but you actually don’t have to choose one or the other as RMarkdown and the <a href="https://rstudio.github.io/reticulate/index.html">r-reticulate</a> package lets you mix and match between both.</p>
-<p>This site was created as RMarkdown in RStudio.</p>
+</div>
 
 <hr><footer><p style="text-align:right;font-size: 10px;"><strong>Standard Disclaimers Apply:</strong>&nbsp;&nbsp;All views are my own, use at your own risk.  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &copy;&nbsp;Copyright&nbsp;2021&nbsp;David&nbsp;Bramwell </p></footer>
 
