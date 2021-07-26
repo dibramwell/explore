@@ -351,6 +351,9 @@ $(document).ready(function () {
   <a href="Filter.html">Simple Filters</a>
 </li>
 <li>
+  <a href="FFT.html">FFT</a>
+</li>
+<li>
   <a href="about.html">About</a>
 </li>
       </ul>
@@ -537,7 +540,7 @@ $(document).ready(function () {
 <span id="cb1-147"><a href="#cb1-147" aria-hidden="true" tabindex="-1"></a>    diff_image<span class="op">=</span>image_gray<span class="op">-</span>filtered_image</span>
 <span id="cb1-148"><a href="#cb1-148" aria-hidden="true" tabindex="-1"></a>    diff_image <span class="op">=</span> gaussian(diff_image, <span class="dv">1</span>,preserve_range<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb1-149"><a href="#cb1-149" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb1-150"><a href="#cb1-150" aria-hidden="true" tabindex="-1"></a>    img_gray_255_2<span class="op">=</span>np.uint8(PercentileScaledImageToImage(diff_image,filtered_image,lowerPerc<span class="op">=</span><span class="fl">0.1</span>,upperPerc<span class="op">=</span><span class="fl">99.9</span>,maxVal<span class="op">=</span><span class="dv">255</span>,invert<span class="op">=</span><span class="va">False</span>))</span>
+<span id="cb1-150"><a href="#cb1-150" aria-hidden="true" tabindex="-1"></a>    img_gray_255_2<span class="op">=</span>np.uint8(PercentileScaledImageToImage(diff_image,image_gray,lowerPerc<span class="op">=</span><span class="fl">0.1</span>,upperPerc<span class="op">=</span><span class="fl">99.9</span>,maxVal<span class="op">=</span><span class="dv">255</span>,invert<span class="op">=</span><span class="va">False</span>))</span>
 <span id="cb1-151"><a href="#cb1-151" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb1-152"><a href="#cb1-152" aria-hidden="true" tabindex="-1"></a>    SaveImageAndMarkdown(outpath<span class="op">+</span>fileWithoutExt<span class="op">+</span>filtName<span class="op">+</span> <span class="st">&quot; Input Image.png&quot;</span>,<span class="dv">255</span><span class="op">-</span>img_gray_255,<span class="st">&quot;#### Input Image&quot;</span>)</span>
 <span id="cb1-153"><a href="#cb1-153" aria-hidden="true" tabindex="-1"></a>  </span>
@@ -551,9 +554,9 @@ $(document).ready(function () {
 <span id="cb1-161"><a href="#cb1-161" aria-hidden="true" tabindex="-1"></a>    img3<span class="op">=</span><span class="dv">255</span><span class="op">-</span>img_gray_255_2</span>
 <span id="cb1-162"><a href="#cb1-162" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb1-163"><a href="#cb1-163" aria-hidden="true" tabindex="-1"></a>    overColour <span class="op">=</span> cv.merge((img3,img1,img3))</span>
-<span id="cb1-164"><a href="#cb1-164" aria-hidden="true" tabindex="-1"></a>    ok<span class="op">=</span>cv.imwrite(outpath<span class="op">+</span>fileWithoutExt<span class="op">+</span>filtName<span class="op">+</span><span class="st">&#39; Overlay&#39;</span><span class="op">+</span> <span class="st">&quot; ChainFiltered.png&quot;</span>, overColour)</span>
-<span id="cb1-165"><a href="#cb1-165" aria-hidden="true" tabindex="-1"></a>    ok<span class="op">=</span>cv.imwrite(outpath<span class="op">+</span>fileWithoutExt<span class="op">+</span>filtName<span class="op">+</span> <span class="st">&quot; ChainFiltered16.tif&quot;</span>, np.uint16(np.clip(diff_image,<span class="dv">0</span>,<span class="dv">65535</span>)))</span>
-<span id="cb1-166"><a href="#cb1-166" aria-hidden="true" tabindex="-1"></a>    SaveImageAndMarkdown(outpath<span class="op">+</span>fileWithoutExt<span class="op">+</span>filtName<span class="op">+</span><span class="st">&#39; Overlay&#39;</span><span class="op">+</span> <span class="st">&quot; ChainFiltered.png&quot;</span>,overColour,<span class="st">&quot;#### overlay&quot;</span>)</span>
+<span id="cb1-164"><a href="#cb1-164" aria-hidden="true" tabindex="-1"></a>    ok<span class="op">=</span>cv.imwrite(outpath<span class="op">+</span>fileWithoutExt<span class="op">+</span>filtName<span class="op">+</span><span class="st">&#39; Overlay&#39;</span><span class="op">+</span> <span class="st">&quot; Filtered.png&quot;</span>, overColour)</span>
+<span id="cb1-165"><a href="#cb1-165" aria-hidden="true" tabindex="-1"></a>    ok<span class="op">=</span>cv.imwrite(outpath<span class="op">+</span>fileWithoutExt<span class="op">+</span>filtName<span class="op">+</span> <span class="st">&quot; Filtered16.tif&quot;</span>, np.uint16(np.clip(diff_image,<span class="dv">0</span>,<span class="dv">65535</span>)))</span>
+<span id="cb1-166"><a href="#cb1-166" aria-hidden="true" tabindex="-1"></a>    SaveImageAndMarkdown(outpath<span class="op">+</span>fileWithoutExt<span class="op">+</span>filtName<span class="op">+</span><span class="st">&#39; Overlay&#39;</span><span class="op">+</span> <span class="st">&quot; Filtered.png&quot;</span>,overColour,<span class="st">&quot;#### overlay&quot;</span>)</span>
 <span id="cb1-167"><a href="#cb1-167" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb1-168"><a href="#cb1-168" aria-hidden="true" tabindex="-1"></a>    fig, ax <span class="op">=</span> try_all_threshold_with_cols(diff_image, figsize<span class="op">=</span>(<span class="dv">8</span>,<span class="dv">4</span>), verbose<span class="op">=</span><span class="va">False</span>)</span>
 <span id="cb1-169"><a href="#cb1-169" aria-hidden="true" tabindex="-1"></a>    SavePlotAndMarkdown(outpath<span class="op">+</span>fileWithoutExt<span class="op">+</span>filtName<span class="op">+</span><span class="st">&quot;ThreshAlgs.png&quot;</span>,<span class="st">&quot;#### multiple threshold techniques on filtered image&quot;</span>)</span>
@@ -585,34 +588,34 @@ $(document).ready(function () {
 </div>
 <div id="overlay" class="section level4">
 <h4>overlay</h4>
-<p><img src="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488Gauss%20Overlay%20ChainFiltered.png" /></p>
-<p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488Gauss%20Overlay%20ChainFiltered.png">procimage/FC3344_LOBE_LANEA_0–Stage20–488/FC3344_LOBE_LANEA_0–Stage20–488Gauss Overlay ChainFiltered.png</a></p>
+<p><img src="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488Gauss%20Overlay%20Filtered.png" /></p>
+<p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488Gauss%20Overlay%20Filtered.png">procimage/FC3344_LOBE_LANEA_0–Stage20–488/FC3344_LOBE_LANEA_0–Stage20–488Gauss Overlay Filtered.png</a></p>
 </div>
 <div id="multiple-threshold-techniques-on-filtered-image" class="section level4">
 <h4>multiple threshold techniques on filtered image</h4>
 <center>
-<img src="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488GaussThreshAlgs.png" />
+<img src="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488GaussThreshAlgs.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488GaussThreshAlgs.png">procimage/FC3344_LOBE_LANEA_0–Stage20–488/FC3344_LOBE_LANEA_0–Stage20–488GaussThreshAlgs.png</a></p>
 </div>
 <div id="sub-area-tl-109-4-br-249-128" class="section level4">
 <h4>sub area TL (109, 4) BR (249, 128)</h4>
 <center>
-<img src="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488Gauss%20TL109_4BR249_1283D.png" />
+<img src="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488Gauss%20TL109_4BR249_1283D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488Gauss%20TL109_4BR249_1283D.png">procimage/FC3344_LOBE_LANEA_0–Stage20–488/FC3344_LOBE_LANEA_0–Stage20–488Gauss TL109_4BR249_1283D.png</a></p>
 </div>
 <div id="sub-area-tl-724-775-br-836-871" class="section level4">
 <h4>sub area TL (724, 775) BR (836, 871)</h4>
 <center>
-<img src="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488Gauss%20TL724_775BR836_8713D.png" />
+<img src="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488Gauss%20TL724_775BR836_8713D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488Gauss%20TL724_775BR836_8713D.png">procimage/FC3344_LOBE_LANEA_0–Stage20–488/FC3344_LOBE_LANEA_0–Stage20–488Gauss TL724_775BR836_8713D.png</a></p>
 </div>
 <div id="sub-area-tl-700-700-br-1400-1400" class="section level4">
 <h4>sub area TL (700, 700) BR (1400, 1400)</h4>
 <center>
-<img src="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488Gauss%20TL700_700BR1400_14003D.png" />
+<img src="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488Gauss%20TL700_700BR1400_14003D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488Gauss%20TL700_700BR1400_14003D.png">procimage/FC3344_LOBE_LANEA_0–Stage20–488/FC3344_LOBE_LANEA_0–Stage20–488Gauss TL700_700BR1400_14003D.png</a></p>
 </div>
@@ -636,34 +639,34 @@ $(document).ready(function () {
 </div>
 <div id="overlay-1" class="section level4">
 <h4>overlay</h4>
-<p><img src="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647Gauss%20Overlay%20ChainFiltered.png" /></p>
-<p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647Gauss%20Overlay%20ChainFiltered.png">procimage/FC3344_LOBE_LANEA_0–Stage20–647/FC3344_LOBE_LANEA_0–Stage20–647Gauss Overlay ChainFiltered.png</a></p>
+<p><img src="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647Gauss%20Overlay%20Filtered.png" /></p>
+<p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647Gauss%20Overlay%20Filtered.png">procimage/FC3344_LOBE_LANEA_0–Stage20–647/FC3344_LOBE_LANEA_0–Stage20–647Gauss Overlay Filtered.png</a></p>
 </div>
 <div id="multiple-threshold-techniques-on-filtered-image-1" class="section level4">
 <h4>multiple threshold techniques on filtered image</h4>
 <center>
-<img src="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647GaussThreshAlgs.png" />
+<img src="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647GaussThreshAlgs.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647GaussThreshAlgs.png">procimage/FC3344_LOBE_LANEA_0–Stage20–647/FC3344_LOBE_LANEA_0–Stage20–647GaussThreshAlgs.png</a></p>
 </div>
 <div id="sub-area-tl-109-4-br-249-128-1" class="section level4">
 <h4>sub area TL (109, 4) BR (249, 128)</h4>
 <center>
-<img src="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647Gauss%20TL109_4BR249_1283D.png" />
+<img src="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647Gauss%20TL109_4BR249_1283D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647Gauss%20TL109_4BR249_1283D.png">procimage/FC3344_LOBE_LANEA_0–Stage20–647/FC3344_LOBE_LANEA_0–Stage20–647Gauss TL109_4BR249_1283D.png</a></p>
 </div>
 <div id="sub-area-tl-724-775-br-836-871-1" class="section level4">
 <h4>sub area TL (724, 775) BR (836, 871)</h4>
 <center>
-<img src="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647Gauss%20TL724_775BR836_8713D.png" />
+<img src="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647Gauss%20TL724_775BR836_8713D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647Gauss%20TL724_775BR836_8713D.png">procimage/FC3344_LOBE_LANEA_0–Stage20–647/FC3344_LOBE_LANEA_0–Stage20–647Gauss TL724_775BR836_8713D.png</a></p>
 </div>
 <div id="sub-area-tl-700-700-br-1400-1400-1" class="section level4">
 <h4>sub area TL (700, 700) BR (1400, 1400)</h4>
 <center>
-<img src="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647Gauss%20TL700_700BR1400_14003D.png" />
+<img src="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647Gauss%20TL700_700BR1400_14003D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647Gauss%20TL700_700BR1400_14003D.png">procimage/FC3344_LOBE_LANEA_0–Stage20–647/FC3344_LOBE_LANEA_0–Stage20–647Gauss TL700_700BR1400_14003D.png</a></p>
 </div>
@@ -687,34 +690,34 @@ $(document).ready(function () {
 </div>
 <div id="overlay-2" class="section level4">
 <h4>overlay</h4>
-<p><img src="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488Gauss%20Overlay%20ChainFiltered.png" /></p>
-<p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488Gauss%20Overlay%20ChainFiltered.png">procimage/FC4447_LOBE_LANEC_0–Stage08–488/FC4447_LOBE_LANEC_0–Stage08–488Gauss Overlay ChainFiltered.png</a></p>
+<p><img src="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488Gauss%20Overlay%20Filtered.png" /></p>
+<p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488Gauss%20Overlay%20Filtered.png">procimage/FC4447_LOBE_LANEC_0–Stage08–488/FC4447_LOBE_LANEC_0–Stage08–488Gauss Overlay Filtered.png</a></p>
 </div>
 <div id="multiple-threshold-techniques-on-filtered-image-2" class="section level4">
 <h4>multiple threshold techniques on filtered image</h4>
 <center>
-<img src="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488GaussThreshAlgs.png" />
+<img src="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488GaussThreshAlgs.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488GaussThreshAlgs.png">procimage/FC4447_LOBE_LANEC_0–Stage08–488/FC4447_LOBE_LANEC_0–Stage08–488GaussThreshAlgs.png</a></p>
 </div>
 <div id="sub-area-tl-109-4-br-249-128-2" class="section level4">
 <h4>sub area TL (109, 4) BR (249, 128)</h4>
 <center>
-<img src="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488Gauss%20TL109_4BR249_1283D.png" />
+<img src="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488Gauss%20TL109_4BR249_1283D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488Gauss%20TL109_4BR249_1283D.png">procimage/FC4447_LOBE_LANEC_0–Stage08–488/FC4447_LOBE_LANEC_0–Stage08–488Gauss TL109_4BR249_1283D.png</a></p>
 </div>
 <div id="sub-area-tl-724-775-br-836-871-2" class="section level4">
 <h4>sub area TL (724, 775) BR (836, 871)</h4>
 <center>
-<img src="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488Gauss%20TL724_775BR836_8713D.png" />
+<img src="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488Gauss%20TL724_775BR836_8713D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488Gauss%20TL724_775BR836_8713D.png">procimage/FC4447_LOBE_LANEC_0–Stage08–488/FC4447_LOBE_LANEC_0–Stage08–488Gauss TL724_775BR836_8713D.png</a></p>
 </div>
 <div id="sub-area-tl-700-700-br-1400-1400-2" class="section level4">
 <h4>sub area TL (700, 700) BR (1400, 1400)</h4>
 <center>
-<img src="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488Gauss%20TL700_700BR1400_14003D.png" />
+<img src="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488Gauss%20TL700_700BR1400_14003D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488Gauss%20TL700_700BR1400_14003D.png">procimage/FC4447_LOBE_LANEC_0–Stage08–488/FC4447_LOBE_LANEC_0–Stage08–488Gauss TL700_700BR1400_14003D.png</a></p>
 </div>
@@ -738,34 +741,34 @@ $(document).ready(function () {
 </div>
 <div id="overlay-3" class="section level4">
 <h4>overlay</h4>
-<p><img src="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647Gauss%20Overlay%20ChainFiltered.png" /></p>
-<p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647Gauss%20Overlay%20ChainFiltered.png">procimage/FC4447_LOBE_LANEC_0–Stage08–647/FC4447_LOBE_LANEC_0–Stage08–647Gauss Overlay ChainFiltered.png</a></p>
+<p><img src="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647Gauss%20Overlay%20Filtered.png" /></p>
+<p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647Gauss%20Overlay%20Filtered.png">procimage/FC4447_LOBE_LANEC_0–Stage08–647/FC4447_LOBE_LANEC_0–Stage08–647Gauss Overlay Filtered.png</a></p>
 </div>
 <div id="multiple-threshold-techniques-on-filtered-image-3" class="section level4">
 <h4>multiple threshold techniques on filtered image</h4>
 <center>
-<img src="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647GaussThreshAlgs.png" />
+<img src="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647GaussThreshAlgs.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647GaussThreshAlgs.png">procimage/FC4447_LOBE_LANEC_0–Stage08–647/FC4447_LOBE_LANEC_0–Stage08–647GaussThreshAlgs.png</a></p>
 </div>
 <div id="sub-area-tl-109-4-br-249-128-3" class="section level4">
 <h4>sub area TL (109, 4) BR (249, 128)</h4>
 <center>
-<img src="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647Gauss%20TL109_4BR249_1283D.png" />
+<img src="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647Gauss%20TL109_4BR249_1283D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647Gauss%20TL109_4BR249_1283D.png">procimage/FC4447_LOBE_LANEC_0–Stage08–647/FC4447_LOBE_LANEC_0–Stage08–647Gauss TL109_4BR249_1283D.png</a></p>
 </div>
 <div id="sub-area-tl-724-775-br-836-871-3" class="section level4">
 <h4>sub area TL (724, 775) BR (836, 871)</h4>
 <center>
-<img src="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647Gauss%20TL724_775BR836_8713D.png" />
+<img src="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647Gauss%20TL724_775BR836_8713D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647Gauss%20TL724_775BR836_8713D.png">procimage/FC4447_LOBE_LANEC_0–Stage08–647/FC4447_LOBE_LANEC_0–Stage08–647Gauss TL724_775BR836_8713D.png</a></p>
 </div>
 <div id="sub-area-tl-700-700-br-1400-1400-3" class="section level4">
 <h4>sub area TL (700, 700) BR (1400, 1400)</h4>
 <center>
-<img src="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647Gauss%20TL700_700BR1400_14003D.png" />
+<img src="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647Gauss%20TL700_700BR1400_14003D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647Gauss%20TL700_700BR1400_14003D.png">procimage/FC4447_LOBE_LANEC_0–Stage08–647/FC4447_LOBE_LANEC_0–Stage08–647Gauss TL700_700BR1400_14003D.png</a></p>
 </div>
@@ -789,34 +792,34 @@ $(document).ready(function () {
 </div>
 <div id="overlay-4" class="section level4">
 <h4>overlay</h4>
-<p><img src="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488Gauss%20Overlay%20ChainFiltered.png" /></p>
-<p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488Gauss%20Overlay%20ChainFiltered.png">procimage/FC4448_LOBE_LANEC_0–Stage08–488/FC4448_LOBE_LANEC_0–Stage08–488Gauss Overlay ChainFiltered.png</a></p>
+<p><img src="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488Gauss%20Overlay%20Filtered.png" /></p>
+<p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488Gauss%20Overlay%20Filtered.png">procimage/FC4448_LOBE_LANEC_0–Stage08–488/FC4448_LOBE_LANEC_0–Stage08–488Gauss Overlay Filtered.png</a></p>
 </div>
 <div id="multiple-threshold-techniques-on-filtered-image-4" class="section level4">
 <h4>multiple threshold techniques on filtered image</h4>
 <center>
-<img src="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488GaussThreshAlgs.png" />
+<img src="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488GaussThreshAlgs.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488GaussThreshAlgs.png">procimage/FC4448_LOBE_LANEC_0–Stage08–488/FC4448_LOBE_LANEC_0–Stage08–488GaussThreshAlgs.png</a></p>
 </div>
 <div id="sub-area-tl-109-4-br-249-128-4" class="section level4">
 <h4>sub area TL (109, 4) BR (249, 128)</h4>
 <center>
-<img src="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488Gauss%20TL109_4BR249_1283D.png" />
+<img src="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488Gauss%20TL109_4BR249_1283D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488Gauss%20TL109_4BR249_1283D.png">procimage/FC4448_LOBE_LANEC_0–Stage08–488/FC4448_LOBE_LANEC_0–Stage08–488Gauss TL109_4BR249_1283D.png</a></p>
 </div>
 <div id="sub-area-tl-724-775-br-836-871-4" class="section level4">
 <h4>sub area TL (724, 775) BR (836, 871)</h4>
 <center>
-<img src="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488Gauss%20TL724_775BR836_8713D.png" />
+<img src="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488Gauss%20TL724_775BR836_8713D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488Gauss%20TL724_775BR836_8713D.png">procimage/FC4448_LOBE_LANEC_0–Stage08–488/FC4448_LOBE_LANEC_0–Stage08–488Gauss TL724_775BR836_8713D.png</a></p>
 </div>
 <div id="sub-area-tl-700-700-br-1400-1400-4" class="section level4">
 <h4>sub area TL (700, 700) BR (1400, 1400)</h4>
 <center>
-<img src="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488Gauss%20TL700_700BR1400_14003D.png" />
+<img src="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488Gauss%20TL700_700BR1400_14003D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488Gauss%20TL700_700BR1400_14003D.png">procimage/FC4448_LOBE_LANEC_0–Stage08–488/FC4448_LOBE_LANEC_0–Stage08–488Gauss TL700_700BR1400_14003D.png</a></p>
 </div>
@@ -840,34 +843,34 @@ $(document).ready(function () {
 </div>
 <div id="overlay-5" class="section level4">
 <h4>overlay</h4>
-<p><img src="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647Gauss%20Overlay%20ChainFiltered.png" /></p>
-<p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647Gauss%20Overlay%20ChainFiltered.png">procimage/FC4448_LOBE_LANEC_0–Stage08–647/FC4448_LOBE_LANEC_0–Stage08–647Gauss Overlay ChainFiltered.png</a></p>
+<p><img src="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647Gauss%20Overlay%20Filtered.png" /></p>
+<p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647Gauss%20Overlay%20Filtered.png">procimage/FC4448_LOBE_LANEC_0–Stage08–647/FC4448_LOBE_LANEC_0–Stage08–647Gauss Overlay Filtered.png</a></p>
 </div>
 <div id="multiple-threshold-techniques-on-filtered-image-5" class="section level4">
 <h4>multiple threshold techniques on filtered image</h4>
 <center>
-<img src="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647GaussThreshAlgs.png" />
+<img src="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647GaussThreshAlgs.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647GaussThreshAlgs.png">procimage/FC4448_LOBE_LANEC_0–Stage08–647/FC4448_LOBE_LANEC_0–Stage08–647GaussThreshAlgs.png</a></p>
 </div>
 <div id="sub-area-tl-109-4-br-249-128-5" class="section level4">
 <h4>sub area TL (109, 4) BR (249, 128)</h4>
 <center>
-<img src="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647Gauss%20TL109_4BR249_1283D.png" />
+<img src="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647Gauss%20TL109_4BR249_1283D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647Gauss%20TL109_4BR249_1283D.png">procimage/FC4448_LOBE_LANEC_0–Stage08–647/FC4448_LOBE_LANEC_0–Stage08–647Gauss TL109_4BR249_1283D.png</a></p>
 </div>
 <div id="sub-area-tl-724-775-br-836-871-5" class="section level4">
 <h4>sub area TL (724, 775) BR (836, 871)</h4>
 <center>
-<img src="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647Gauss%20TL724_775BR836_8713D.png" />
+<img src="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647Gauss%20TL724_775BR836_8713D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647Gauss%20TL724_775BR836_8713D.png">procimage/FC4448_LOBE_LANEC_0–Stage08–647/FC4448_LOBE_LANEC_0–Stage08–647Gauss TL724_775BR836_8713D.png</a></p>
 </div>
 <div id="sub-area-tl-700-700-br-1400-1400-5" class="section level4">
 <h4>sub area TL (700, 700) BR (1400, 1400)</h4>
 <center>
-<img src="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647Gauss%20TL700_700BR1400_14003D.png" />
+<img src="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647Gauss%20TL700_700BR1400_14003D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647Gauss%20TL700_700BR1400_14003D.png">procimage/FC4448_LOBE_LANEC_0–Stage08–647/FC4448_LOBE_LANEC_0–Stage08–647Gauss TL700_700BR1400_14003D.png</a></p>
 </div>
@@ -891,34 +894,34 @@ $(document).ready(function () {
 </div>
 <div id="overlay-6" class="section level4">
 <h4>overlay</h4>
-<p><img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488Gauss%20Overlay%20ChainFiltered.png" /></p>
-<p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488Gauss%20Overlay%20ChainFiltered.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–488/FC4573_LOBE01_LANEA_0–Stage08–488Gauss Overlay ChainFiltered.png</a></p>
+<p><img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488Gauss%20Overlay%20Filtered.png" /></p>
+<p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488Gauss%20Overlay%20Filtered.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–488/FC4573_LOBE01_LANEA_0–Stage08–488Gauss Overlay Filtered.png</a></p>
 </div>
 <div id="multiple-threshold-techniques-on-filtered-image-6" class="section level4">
 <h4>multiple threshold techniques on filtered image</h4>
 <center>
-<img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488GaussThreshAlgs.png" />
+<img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488GaussThreshAlgs.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488GaussThreshAlgs.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–488/FC4573_LOBE01_LANEA_0–Stage08–488GaussThreshAlgs.png</a></p>
 </div>
 <div id="sub-area-tl-109-4-br-249-128-6" class="section level4">
 <h4>sub area TL (109, 4) BR (249, 128)</h4>
 <center>
-<img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488Gauss%20TL109_4BR249_1283D.png" />
+<img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488Gauss%20TL109_4BR249_1283D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488Gauss%20TL109_4BR249_1283D.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–488/FC4573_LOBE01_LANEA_0–Stage08–488Gauss TL109_4BR249_1283D.png</a></p>
 </div>
 <div id="sub-area-tl-724-775-br-836-871-6" class="section level4">
 <h4>sub area TL (724, 775) BR (836, 871)</h4>
 <center>
-<img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488Gauss%20TL724_775BR836_8713D.png" />
+<img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488Gauss%20TL724_775BR836_8713D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488Gauss%20TL724_775BR836_8713D.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–488/FC4573_LOBE01_LANEA_0–Stage08–488Gauss TL724_775BR836_8713D.png</a></p>
 </div>
 <div id="sub-area-tl-700-700-br-1400-1400-6" class="section level4">
 <h4>sub area TL (700, 700) BR (1400, 1400)</h4>
 <center>
-<img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488Gauss%20TL700_700BR1400_14003D.png" />
+<img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488Gauss%20TL700_700BR1400_14003D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488Gauss%20TL700_700BR1400_14003D.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–488/FC4573_LOBE01_LANEA_0–Stage08–488Gauss TL700_700BR1400_14003D.png</a></p>
 </div>
@@ -942,34 +945,34 @@ $(document).ready(function () {
 </div>
 <div id="overlay-7" class="section level4">
 <h4>overlay</h4>
-<p><img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647Gauss%20Overlay%20ChainFiltered.png" /></p>
-<p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647Gauss%20Overlay%20ChainFiltered.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–647/FC4573_LOBE01_LANEA_0–Stage08–647Gauss Overlay ChainFiltered.png</a></p>
+<p><img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647Gauss%20Overlay%20Filtered.png" /></p>
+<p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647Gauss%20Overlay%20Filtered.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–647/FC4573_LOBE01_LANEA_0–Stage08–647Gauss Overlay Filtered.png</a></p>
 </div>
 <div id="multiple-threshold-techniques-on-filtered-image-7" class="section level4">
 <h4>multiple threshold techniques on filtered image</h4>
 <center>
-<img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647GaussThreshAlgs.png" />
+<img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647GaussThreshAlgs.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647GaussThreshAlgs.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–647/FC4573_LOBE01_LANEA_0–Stage08–647GaussThreshAlgs.png</a></p>
 </div>
 <div id="sub-area-tl-109-4-br-249-128-7" class="section level4">
 <h4>sub area TL (109, 4) BR (249, 128)</h4>
 <center>
-<img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647Gauss%20TL109_4BR249_1283D.png" />
+<img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647Gauss%20TL109_4BR249_1283D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647Gauss%20TL109_4BR249_1283D.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–647/FC4573_LOBE01_LANEA_0–Stage08–647Gauss TL109_4BR249_1283D.png</a></p>
 </div>
 <div id="sub-area-tl-724-775-br-836-871-7" class="section level4">
 <h4>sub area TL (724, 775) BR (836, 871)</h4>
 <center>
-<img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647Gauss%20TL724_775BR836_8713D.png" />
+<img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647Gauss%20TL724_775BR836_8713D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647Gauss%20TL724_775BR836_8713D.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–647/FC4573_LOBE01_LANEA_0–Stage08–647Gauss TL724_775BR836_8713D.png</a></p>
 </div>
 <div id="sub-area-tl-700-700-br-1400-1400-7" class="section level4">
 <h4>sub area TL (700, 700) BR (1400, 1400)</h4>
 <center>
-<img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647Gauss%20TL700_700BR1400_14003D.png" />
+<img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647Gauss%20TL700_700BR1400_14003D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647Gauss%20TL700_700BR1400_14003D.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–647/FC4573_LOBE01_LANEA_0–Stage08–647Gauss TL700_700BR1400_14003D.png</a></p>
 </div>
@@ -993,34 +996,34 @@ $(document).ready(function () {
 </div>
 <div id="overlay-8" class="section level4">
 <h4>overlay</h4>
-<p><img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488Gauss%20Overlay%20ChainFiltered.png" /></p>
-<p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488Gauss%20Overlay%20ChainFiltered.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–488/FC4575_LOBE01_LANEB_0–Stage17–488Gauss Overlay ChainFiltered.png</a></p>
+<p><img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488Gauss%20Overlay%20Filtered.png" /></p>
+<p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488Gauss%20Overlay%20Filtered.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–488/FC4575_LOBE01_LANEB_0–Stage17–488Gauss Overlay Filtered.png</a></p>
 </div>
 <div id="multiple-threshold-techniques-on-filtered-image-8" class="section level4">
 <h4>multiple threshold techniques on filtered image</h4>
 <center>
-<img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488GaussThreshAlgs.png" />
+<img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488GaussThreshAlgs.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488GaussThreshAlgs.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–488/FC4575_LOBE01_LANEB_0–Stage17–488GaussThreshAlgs.png</a></p>
 </div>
 <div id="sub-area-tl-109-4-br-249-128-8" class="section level4">
 <h4>sub area TL (109, 4) BR (249, 128)</h4>
 <center>
-<img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488Gauss%20TL109_4BR249_1283D.png" />
+<img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488Gauss%20TL109_4BR249_1283D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488Gauss%20TL109_4BR249_1283D.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–488/FC4575_LOBE01_LANEB_0–Stage17–488Gauss TL109_4BR249_1283D.png</a></p>
 </div>
 <div id="sub-area-tl-724-775-br-836-871-8" class="section level4">
 <h4>sub area TL (724, 775) BR (836, 871)</h4>
 <center>
-<img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488Gauss%20TL724_775BR836_8713D.png" />
+<img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488Gauss%20TL724_775BR836_8713D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488Gauss%20TL724_775BR836_8713D.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–488/FC4575_LOBE01_LANEB_0–Stage17–488Gauss TL724_775BR836_8713D.png</a></p>
 </div>
 <div id="sub-area-tl-700-700-br-1400-1400-8" class="section level4">
 <h4>sub area TL (700, 700) BR (1400, 1400)</h4>
 <center>
-<img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488Gauss%20TL700_700BR1400_14003D.png" />
+<img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488Gauss%20TL700_700BR1400_14003D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488Gauss%20TL700_700BR1400_14003D.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–488/FC4575_LOBE01_LANEB_0–Stage17–488Gauss TL700_700BR1400_14003D.png</a></p>
 </div>
@@ -1044,34 +1047,34 @@ $(document).ready(function () {
 </div>
 <div id="overlay-9" class="section level4">
 <h4>overlay</h4>
-<p><img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647Gauss%20Overlay%20ChainFiltered.png" /></p>
-<p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647Gauss%20Overlay%20ChainFiltered.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–647/FC4575_LOBE01_LANEB_0–Stage17–647Gauss Overlay ChainFiltered.png</a></p>
+<p><img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647Gauss%20Overlay%20Filtered.png" /></p>
+<p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647Gauss%20Overlay%20Filtered.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–647/FC4575_LOBE01_LANEB_0–Stage17–647Gauss Overlay Filtered.png</a></p>
 </div>
 <div id="multiple-threshold-techniques-on-filtered-image-9" class="section level4">
 <h4>multiple threshold techniques on filtered image</h4>
 <center>
-<img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647GaussThreshAlgs.png" />
+<img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647GaussThreshAlgs.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647GaussThreshAlgs.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–647/FC4575_LOBE01_LANEB_0–Stage17–647GaussThreshAlgs.png</a></p>
 </div>
 <div id="sub-area-tl-109-4-br-249-128-9" class="section level4">
 <h4>sub area TL (109, 4) BR (249, 128)</h4>
 <center>
-<img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647Gauss%20TL109_4BR249_1283D.png" />
+<img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647Gauss%20TL109_4BR249_1283D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647Gauss%20TL109_4BR249_1283D.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–647/FC4575_LOBE01_LANEB_0–Stage17–647Gauss TL109_4BR249_1283D.png</a></p>
 </div>
 <div id="sub-area-tl-724-775-br-836-871-9" class="section level4">
 <h4>sub area TL (724, 775) BR (836, 871)</h4>
 <center>
-<img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647Gauss%20TL724_775BR836_8713D.png" />
+<img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647Gauss%20TL724_775BR836_8713D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647Gauss%20TL724_775BR836_8713D.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–647/FC4575_LOBE01_LANEB_0–Stage17–647Gauss TL724_775BR836_8713D.png</a></p>
 </div>
 <div id="sub-area-tl-700-700-br-1400-1400-9" class="section level4">
 <h4>sub area TL (700, 700) BR (1400, 1400)</h4>
 <center>
-<img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647Gauss%20TL700_700BR1400_14003D.png" />
+<img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647Gauss%20TL700_700BR1400_14003D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647Gauss%20TL700_700BR1400_14003D.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–647/FC4575_LOBE01_LANEB_0–Stage17–647Gauss TL700_700BR1400_14003D.png</a></p>
 </div>
@@ -1095,34 +1098,34 @@ $(document).ready(function () {
 </div>
 <div id="overlay-10" class="section level4">
 <h4>overlay</h4>
-<p><img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488Gauss%20Overlay%20ChainFiltered.png" /></p>
-<p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488Gauss%20Overlay%20ChainFiltered.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–488/FC4575_LOBE02_LANEB_0–Stage17–488Gauss Overlay ChainFiltered.png</a></p>
+<p><img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488Gauss%20Overlay%20Filtered.png" /></p>
+<p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488Gauss%20Overlay%20Filtered.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–488/FC4575_LOBE02_LANEB_0–Stage17–488Gauss Overlay Filtered.png</a></p>
 </div>
 <div id="multiple-threshold-techniques-on-filtered-image-10" class="section level4">
 <h4>multiple threshold techniques on filtered image</h4>
 <center>
-<img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488GaussThreshAlgs.png" />
+<img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488GaussThreshAlgs.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488GaussThreshAlgs.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–488/FC4575_LOBE02_LANEB_0–Stage17–488GaussThreshAlgs.png</a></p>
 </div>
 <div id="sub-area-tl-109-4-br-249-128-10" class="section level4">
 <h4>sub area TL (109, 4) BR (249, 128)</h4>
 <center>
-<img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488Gauss%20TL109_4BR249_1283D.png" />
+<img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488Gauss%20TL109_4BR249_1283D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488Gauss%20TL109_4BR249_1283D.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–488/FC4575_LOBE02_LANEB_0–Stage17–488Gauss TL109_4BR249_1283D.png</a></p>
 </div>
 <div id="sub-area-tl-724-775-br-836-871-10" class="section level4">
 <h4>sub area TL (724, 775) BR (836, 871)</h4>
 <center>
-<img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488Gauss%20TL724_775BR836_8713D.png" />
+<img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488Gauss%20TL724_775BR836_8713D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488Gauss%20TL724_775BR836_8713D.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–488/FC4575_LOBE02_LANEB_0–Stage17–488Gauss TL724_775BR836_8713D.png</a></p>
 </div>
 <div id="sub-area-tl-700-700-br-1400-1400-10" class="section level4">
 <h4>sub area TL (700, 700) BR (1400, 1400)</h4>
 <center>
-<img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488Gauss%20TL700_700BR1400_14003D.png" />
+<img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488Gauss%20TL700_700BR1400_14003D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488Gauss%20TL700_700BR1400_14003D.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–488/FC4575_LOBE02_LANEB_0–Stage17–488Gauss TL700_700BR1400_14003D.png</a></p>
 </div>
@@ -1146,34 +1149,34 @@ $(document).ready(function () {
 </div>
 <div id="overlay-11" class="section level4">
 <h4>overlay</h4>
-<p><img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647Gauss%20Overlay%20ChainFiltered.png" /></p>
-<p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647Gauss%20Overlay%20ChainFiltered.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–647/FC4575_LOBE02_LANEB_0–Stage17–647Gauss Overlay ChainFiltered.png</a></p>
+<p><img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647Gauss%20Overlay%20Filtered.png" /></p>
+<p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647Gauss%20Overlay%20Filtered.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–647/FC4575_LOBE02_LANEB_0–Stage17–647Gauss Overlay Filtered.png</a></p>
 </div>
 <div id="multiple-threshold-techniques-on-filtered-image-11" class="section level4">
 <h4>multiple threshold techniques on filtered image</h4>
 <center>
-<img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647GaussThreshAlgs.png" />
+<img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647GaussThreshAlgs.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647GaussThreshAlgs.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–647/FC4575_LOBE02_LANEB_0–Stage17–647GaussThreshAlgs.png</a></p>
 </div>
 <div id="sub-area-tl-109-4-br-249-128-11" class="section level4">
 <h4>sub area TL (109, 4) BR (249, 128)</h4>
 <center>
-<img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647Gauss%20TL109_4BR249_1283D.png" />
+<img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647Gauss%20TL109_4BR249_1283D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647Gauss%20TL109_4BR249_1283D.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–647/FC4575_LOBE02_LANEB_0–Stage17–647Gauss TL109_4BR249_1283D.png</a></p>
 </div>
 <div id="sub-area-tl-724-775-br-836-871-11" class="section level4">
 <h4>sub area TL (724, 775) BR (836, 871)</h4>
 <center>
-<img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647Gauss%20TL724_775BR836_8713D.png" />
+<img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647Gauss%20TL724_775BR836_8713D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647Gauss%20TL724_775BR836_8713D.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–647/FC4575_LOBE02_LANEB_0–Stage17–647Gauss TL724_775BR836_8713D.png</a></p>
 </div>
 <div id="sub-area-tl-700-700-br-1400-1400-11" class="section level4">
 <h4>sub area TL (700, 700) BR (1400, 1400)</h4>
 <center>
-<img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647Gauss%20TL700_700BR1400_14003D.png" />
+<img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647Gauss%20TL700_700BR1400_14003D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647Gauss%20TL700_700BR1400_14003D.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–647/FC4575_LOBE02_LANEB_0–Stage17–647Gauss TL700_700BR1400_14003D.png</a></p>
 </div>
@@ -1197,34 +1200,34 @@ $(document).ready(function () {
 </div>
 <div id="overlay-12" class="section level4">
 <h4>overlay</h4>
-<p><img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488Gauss%20Overlay%20ChainFiltered.png" /></p>
-<p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488Gauss%20Overlay%20ChainFiltered.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–488/FC4899_LOBE_01__LANEB_0–Stage08–488Gauss Overlay ChainFiltered.png</a></p>
+<p><img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488Gauss%20Overlay%20Filtered.png" /></p>
+<p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488Gauss%20Overlay%20Filtered.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–488/FC4899_LOBE_01__LANEB_0–Stage08–488Gauss Overlay Filtered.png</a></p>
 </div>
 <div id="multiple-threshold-techniques-on-filtered-image-12" class="section level4">
 <h4>multiple threshold techniques on filtered image</h4>
 <center>
-<img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488GaussThreshAlgs.png" />
+<img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488GaussThreshAlgs.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488GaussThreshAlgs.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–488/FC4899_LOBE_01__LANEB_0–Stage08–488GaussThreshAlgs.png</a></p>
 </div>
 <div id="sub-area-tl-109-4-br-249-128-12" class="section level4">
 <h4>sub area TL (109, 4) BR (249, 128)</h4>
 <center>
-<img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488Gauss%20TL109_4BR249_1283D.png" />
+<img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488Gauss%20TL109_4BR249_1283D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488Gauss%20TL109_4BR249_1283D.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–488/FC4899_LOBE_01__LANEB_0–Stage08–488Gauss TL109_4BR249_1283D.png</a></p>
 </div>
 <div id="sub-area-tl-724-775-br-836-871-12" class="section level4">
 <h4>sub area TL (724, 775) BR (836, 871)</h4>
 <center>
-<img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488Gauss%20TL724_775BR836_8713D.png" />
+<img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488Gauss%20TL724_775BR836_8713D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488Gauss%20TL724_775BR836_8713D.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–488/FC4899_LOBE_01__LANEB_0–Stage08–488Gauss TL724_775BR836_8713D.png</a></p>
 </div>
 <div id="sub-area-tl-700-700-br-1400-1400-12" class="section level4">
 <h4>sub area TL (700, 700) BR (1400, 1400)</h4>
 <center>
-<img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488Gauss%20TL700_700BR1400_14003D.png" />
+<img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488Gauss%20TL700_700BR1400_14003D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488Gauss%20TL700_700BR1400_14003D.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–488/FC4899_LOBE_01__LANEB_0–Stage08–488Gauss TL700_700BR1400_14003D.png</a></p>
 </div>
@@ -1248,37 +1251,37 @@ $(document).ready(function () {
 </div>
 <div id="overlay-13" class="section level4">
 <h4>overlay</h4>
-<p><img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647Gauss%20Overlay%20ChainFiltered.png" /></p>
-<p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647Gauss%20Overlay%20ChainFiltered.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–647/FC4899_LOBE_01__LANEB_0–Stage08–647Gauss Overlay ChainFiltered.png</a></p>
+<p><img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647Gauss%20Overlay%20Filtered.png" /></p>
+<p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647Gauss%20Overlay%20Filtered.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–647/FC4899_LOBE_01__LANEB_0–Stage08–647Gauss Overlay Filtered.png</a></p>
 </div>
 <div id="multiple-threshold-techniques-on-filtered-image-13" class="section level4">
 <h4>multiple threshold techniques on filtered image</h4>
 <center>
-<img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647GaussThreshAlgs.png" />
+<img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647GaussThreshAlgs.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647GaussThreshAlgs.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–647/FC4899_LOBE_01__LANEB_0–Stage08–647GaussThreshAlgs.png</a></p>
 </div>
 <div id="sub-area-tl-109-4-br-249-128-13" class="section level4">
 <h4>sub area TL (109, 4) BR (249, 128)</h4>
 <center>
-<img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647Gauss%20TL109_4BR249_1283D.png" />
+<img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647Gauss%20TL109_4BR249_1283D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647Gauss%20TL109_4BR249_1283D.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–647/FC4899_LOBE_01__LANEB_0–Stage08–647Gauss TL109_4BR249_1283D.png</a></p>
 </div>
 <div id="sub-area-tl-724-775-br-836-871-13" class="section level4">
 <h4>sub area TL (724, 775) BR (836, 871)</h4>
 <center>
-<img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647Gauss%20TL724_775BR836_8713D.png" />
+<img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647Gauss%20TL724_775BR836_8713D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647Gauss%20TL724_775BR836_8713D.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–647/FC4899_LOBE_01__LANEB_0–Stage08–647Gauss TL724_775BR836_8713D.png</a></p>
 </div>
 <div id="sub-area-tl-700-700-br-1400-1400-13" class="section level4">
 <h4>sub area TL (700, 700) BR (1400, 1400)</h4>
 <center>
-<img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647Gauss%20TL700_700BR1400_14003D.png" />
+<img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647Gauss%20TL700_700BR1400_14003D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647Gauss%20TL700_700BR1400_14003D.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–647/FC4899_LOBE_01__LANEB_0–Stage08–647Gauss TL700_700BR1400_14003D.png</a></p>
-<p>Time for this code chunk to run: 6.595 s</p>
+<p>Time for this code chunk to run: 6.655 s</p>
 </div>
 </div>
 </div>
@@ -1305,34 +1308,34 @@ $(document).ready(function () {
 </div>
 <div id="overlay-14" class="section level4">
 <h4>overlay</h4>
-<p><img src="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488DoG%20Overlay%20ChainFiltered.png" /></p>
-<p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488DoG%20Overlay%20ChainFiltered.png">procimage/FC3344_LOBE_LANEA_0–Stage20–488/FC3344_LOBE_LANEA_0–Stage20–488DoG Overlay ChainFiltered.png</a></p>
+<p><img src="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488DoG%20Overlay%20Filtered.png" /></p>
+<p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488DoG%20Overlay%20Filtered.png">procimage/FC3344_LOBE_LANEA_0–Stage20–488/FC3344_LOBE_LANEA_0–Stage20–488DoG Overlay Filtered.png</a></p>
 </div>
 <div id="multiple-threshold-techniques-on-filtered-image-14" class="section level4">
 <h4>multiple threshold techniques on filtered image</h4>
 <center>
-<img src="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488DoGThreshAlgs.png" />
+<img src="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488DoGThreshAlgs.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488DoGThreshAlgs.png">procimage/FC3344_LOBE_LANEA_0–Stage20–488/FC3344_LOBE_LANEA_0–Stage20–488DoGThreshAlgs.png</a></p>
 </div>
 <div id="sub-area-tl-109-4-br-249-128-14" class="section level4">
 <h4>sub area TL (109, 4) BR (249, 128)</h4>
 <center>
-<img src="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488DoG%20TL109_4BR249_1283D.png" />
+<img src="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488DoG%20TL109_4BR249_1283D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488DoG%20TL109_4BR249_1283D.png">procimage/FC3344_LOBE_LANEA_0–Stage20–488/FC3344_LOBE_LANEA_0–Stage20–488DoG TL109_4BR249_1283D.png</a></p>
 </div>
 <div id="sub-area-tl-724-775-br-836-871-14" class="section level4">
 <h4>sub area TL (724, 775) BR (836, 871)</h4>
 <center>
-<img src="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488DoG%20TL724_775BR836_8713D.png" />
+<img src="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488DoG%20TL724_775BR836_8713D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488DoG%20TL724_775BR836_8713D.png">procimage/FC3344_LOBE_LANEA_0–Stage20–488/FC3344_LOBE_LANEA_0–Stage20–488DoG TL724_775BR836_8713D.png</a></p>
 </div>
 <div id="sub-area-tl-700-700-br-1400-1400-14" class="section level4">
 <h4>sub area TL (700, 700) BR (1400, 1400)</h4>
 <center>
-<img src="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488DoG%20TL700_700BR1400_14003D.png" />
+<img src="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488DoG%20TL700_700BR1400_14003D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--488/FC3344_LOBE_LANEA_0--Stage20--488DoG%20TL700_700BR1400_14003D.png">procimage/FC3344_LOBE_LANEA_0–Stage20–488/FC3344_LOBE_LANEA_0–Stage20–488DoG TL700_700BR1400_14003D.png</a></p>
 </div>
@@ -1356,34 +1359,34 @@ $(document).ready(function () {
 </div>
 <div id="overlay-15" class="section level4">
 <h4>overlay</h4>
-<p><img src="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647DoG%20Overlay%20ChainFiltered.png" /></p>
-<p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647DoG%20Overlay%20ChainFiltered.png">procimage/FC3344_LOBE_LANEA_0–Stage20–647/FC3344_LOBE_LANEA_0–Stage20–647DoG Overlay ChainFiltered.png</a></p>
+<p><img src="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647DoG%20Overlay%20Filtered.png" /></p>
+<p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647DoG%20Overlay%20Filtered.png">procimage/FC3344_LOBE_LANEA_0–Stage20–647/FC3344_LOBE_LANEA_0–Stage20–647DoG Overlay Filtered.png</a></p>
 </div>
 <div id="multiple-threshold-techniques-on-filtered-image-15" class="section level4">
 <h4>multiple threshold techniques on filtered image</h4>
 <center>
-<img src="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647DoGThreshAlgs.png" />
+<img src="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647DoGThreshAlgs.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647DoGThreshAlgs.png">procimage/FC3344_LOBE_LANEA_0–Stage20–647/FC3344_LOBE_LANEA_0–Stage20–647DoGThreshAlgs.png</a></p>
 </div>
 <div id="sub-area-tl-109-4-br-249-128-15" class="section level4">
 <h4>sub area TL (109, 4) BR (249, 128)</h4>
 <center>
-<img src="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647DoG%20TL109_4BR249_1283D.png" />
+<img src="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647DoG%20TL109_4BR249_1283D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647DoG%20TL109_4BR249_1283D.png">procimage/FC3344_LOBE_LANEA_0–Stage20–647/FC3344_LOBE_LANEA_0–Stage20–647DoG TL109_4BR249_1283D.png</a></p>
 </div>
 <div id="sub-area-tl-724-775-br-836-871-15" class="section level4">
 <h4>sub area TL (724, 775) BR (836, 871)</h4>
 <center>
-<img src="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647DoG%20TL724_775BR836_8713D.png" />
+<img src="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647DoG%20TL724_775BR836_8713D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647DoG%20TL724_775BR836_8713D.png">procimage/FC3344_LOBE_LANEA_0–Stage20–647/FC3344_LOBE_LANEA_0–Stage20–647DoG TL724_775BR836_8713D.png</a></p>
 </div>
 <div id="sub-area-tl-700-700-br-1400-1400-15" class="section level4">
 <h4>sub area TL (700, 700) BR (1400, 1400)</h4>
 <center>
-<img src="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647DoG%20TL700_700BR1400_14003D.png" />
+<img src="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647DoG%20TL700_700BR1400_14003D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC3344_LOBE_LANEA_0--Stage20--647/FC3344_LOBE_LANEA_0--Stage20--647DoG%20TL700_700BR1400_14003D.png">procimage/FC3344_LOBE_LANEA_0–Stage20–647/FC3344_LOBE_LANEA_0–Stage20–647DoG TL700_700BR1400_14003D.png</a></p>
 </div>
@@ -1407,34 +1410,34 @@ $(document).ready(function () {
 </div>
 <div id="overlay-16" class="section level4">
 <h4>overlay</h4>
-<p><img src="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488DoG%20Overlay%20ChainFiltered.png" /></p>
-<p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488DoG%20Overlay%20ChainFiltered.png">procimage/FC4447_LOBE_LANEC_0–Stage08–488/FC4447_LOBE_LANEC_0–Stage08–488DoG Overlay ChainFiltered.png</a></p>
+<p><img src="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488DoG%20Overlay%20Filtered.png" /></p>
+<p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488DoG%20Overlay%20Filtered.png">procimage/FC4447_LOBE_LANEC_0–Stage08–488/FC4447_LOBE_LANEC_0–Stage08–488DoG Overlay Filtered.png</a></p>
 </div>
 <div id="multiple-threshold-techniques-on-filtered-image-16" class="section level4">
 <h4>multiple threshold techniques on filtered image</h4>
 <center>
-<img src="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488DoGThreshAlgs.png" />
+<img src="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488DoGThreshAlgs.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488DoGThreshAlgs.png">procimage/FC4447_LOBE_LANEC_0–Stage08–488/FC4447_LOBE_LANEC_0–Stage08–488DoGThreshAlgs.png</a></p>
 </div>
 <div id="sub-area-tl-109-4-br-249-128-16" class="section level4">
 <h4>sub area TL (109, 4) BR (249, 128)</h4>
 <center>
-<img src="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488DoG%20TL109_4BR249_1283D.png" />
+<img src="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488DoG%20TL109_4BR249_1283D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488DoG%20TL109_4BR249_1283D.png">procimage/FC4447_LOBE_LANEC_0–Stage08–488/FC4447_LOBE_LANEC_0–Stage08–488DoG TL109_4BR249_1283D.png</a></p>
 </div>
 <div id="sub-area-tl-724-775-br-836-871-16" class="section level4">
 <h4>sub area TL (724, 775) BR (836, 871)</h4>
 <center>
-<img src="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488DoG%20TL724_775BR836_8713D.png" />
+<img src="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488DoG%20TL724_775BR836_8713D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488DoG%20TL724_775BR836_8713D.png">procimage/FC4447_LOBE_LANEC_0–Stage08–488/FC4447_LOBE_LANEC_0–Stage08–488DoG TL724_775BR836_8713D.png</a></p>
 </div>
 <div id="sub-area-tl-700-700-br-1400-1400-16" class="section level4">
 <h4>sub area TL (700, 700) BR (1400, 1400)</h4>
 <center>
-<img src="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488DoG%20TL700_700BR1400_14003D.png" />
+<img src="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488DoG%20TL700_700BR1400_14003D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--488/FC4447_LOBE_LANEC_0--Stage08--488DoG%20TL700_700BR1400_14003D.png">procimage/FC4447_LOBE_LANEC_0–Stage08–488/FC4447_LOBE_LANEC_0–Stage08–488DoG TL700_700BR1400_14003D.png</a></p>
 </div>
@@ -1458,34 +1461,34 @@ $(document).ready(function () {
 </div>
 <div id="overlay-17" class="section level4">
 <h4>overlay</h4>
-<p><img src="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647DoG%20Overlay%20ChainFiltered.png" /></p>
-<p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647DoG%20Overlay%20ChainFiltered.png">procimage/FC4447_LOBE_LANEC_0–Stage08–647/FC4447_LOBE_LANEC_0–Stage08–647DoG Overlay ChainFiltered.png</a></p>
+<p><img src="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647DoG%20Overlay%20Filtered.png" /></p>
+<p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647DoG%20Overlay%20Filtered.png">procimage/FC4447_LOBE_LANEC_0–Stage08–647/FC4447_LOBE_LANEC_0–Stage08–647DoG Overlay Filtered.png</a></p>
 </div>
 <div id="multiple-threshold-techniques-on-filtered-image-17" class="section level4">
 <h4>multiple threshold techniques on filtered image</h4>
 <center>
-<img src="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647DoGThreshAlgs.png" />
+<img src="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647DoGThreshAlgs.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647DoGThreshAlgs.png">procimage/FC4447_LOBE_LANEC_0–Stage08–647/FC4447_LOBE_LANEC_0–Stage08–647DoGThreshAlgs.png</a></p>
 </div>
 <div id="sub-area-tl-109-4-br-249-128-17" class="section level4">
 <h4>sub area TL (109, 4) BR (249, 128)</h4>
 <center>
-<img src="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647DoG%20TL109_4BR249_1283D.png" />
+<img src="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647DoG%20TL109_4BR249_1283D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647DoG%20TL109_4BR249_1283D.png">procimage/FC4447_LOBE_LANEC_0–Stage08–647/FC4447_LOBE_LANEC_0–Stage08–647DoG TL109_4BR249_1283D.png</a></p>
 </div>
 <div id="sub-area-tl-724-775-br-836-871-17" class="section level4">
 <h4>sub area TL (724, 775) BR (836, 871)</h4>
 <center>
-<img src="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647DoG%20TL724_775BR836_8713D.png" />
+<img src="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647DoG%20TL724_775BR836_8713D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647DoG%20TL724_775BR836_8713D.png">procimage/FC4447_LOBE_LANEC_0–Stage08–647/FC4447_LOBE_LANEC_0–Stage08–647DoG TL724_775BR836_8713D.png</a></p>
 </div>
 <div id="sub-area-tl-700-700-br-1400-1400-17" class="section level4">
 <h4>sub area TL (700, 700) BR (1400, 1400)</h4>
 <center>
-<img src="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647DoG%20TL700_700BR1400_14003D.png" />
+<img src="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647DoG%20TL700_700BR1400_14003D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4447_LOBE_LANEC_0--Stage08--647/FC4447_LOBE_LANEC_0--Stage08--647DoG%20TL700_700BR1400_14003D.png">procimage/FC4447_LOBE_LANEC_0–Stage08–647/FC4447_LOBE_LANEC_0–Stage08–647DoG TL700_700BR1400_14003D.png</a></p>
 </div>
@@ -1509,34 +1512,34 @@ $(document).ready(function () {
 </div>
 <div id="overlay-18" class="section level4">
 <h4>overlay</h4>
-<p><img src="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488DoG%20Overlay%20ChainFiltered.png" /></p>
-<p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488DoG%20Overlay%20ChainFiltered.png">procimage/FC4448_LOBE_LANEC_0–Stage08–488/FC4448_LOBE_LANEC_0–Stage08–488DoG Overlay ChainFiltered.png</a></p>
+<p><img src="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488DoG%20Overlay%20Filtered.png" /></p>
+<p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488DoG%20Overlay%20Filtered.png">procimage/FC4448_LOBE_LANEC_0–Stage08–488/FC4448_LOBE_LANEC_0–Stage08–488DoG Overlay Filtered.png</a></p>
 </div>
 <div id="multiple-threshold-techniques-on-filtered-image-18" class="section level4">
 <h4>multiple threshold techniques on filtered image</h4>
 <center>
-<img src="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488DoGThreshAlgs.png" />
+<img src="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488DoGThreshAlgs.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488DoGThreshAlgs.png">procimage/FC4448_LOBE_LANEC_0–Stage08–488/FC4448_LOBE_LANEC_0–Stage08–488DoGThreshAlgs.png</a></p>
 </div>
 <div id="sub-area-tl-109-4-br-249-128-18" class="section level4">
 <h4>sub area TL (109, 4) BR (249, 128)</h4>
 <center>
-<img src="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488DoG%20TL109_4BR249_1283D.png" />
+<img src="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488DoG%20TL109_4BR249_1283D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488DoG%20TL109_4BR249_1283D.png">procimage/FC4448_LOBE_LANEC_0–Stage08–488/FC4448_LOBE_LANEC_0–Stage08–488DoG TL109_4BR249_1283D.png</a></p>
 </div>
 <div id="sub-area-tl-724-775-br-836-871-18" class="section level4">
 <h4>sub area TL (724, 775) BR (836, 871)</h4>
 <center>
-<img src="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488DoG%20TL724_775BR836_8713D.png" />
+<img src="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488DoG%20TL724_775BR836_8713D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488DoG%20TL724_775BR836_8713D.png">procimage/FC4448_LOBE_LANEC_0–Stage08–488/FC4448_LOBE_LANEC_0–Stage08–488DoG TL724_775BR836_8713D.png</a></p>
 </div>
 <div id="sub-area-tl-700-700-br-1400-1400-18" class="section level4">
 <h4>sub area TL (700, 700) BR (1400, 1400)</h4>
 <center>
-<img src="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488DoG%20TL700_700BR1400_14003D.png" />
+<img src="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488DoG%20TL700_700BR1400_14003D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--488/FC4448_LOBE_LANEC_0--Stage08--488DoG%20TL700_700BR1400_14003D.png">procimage/FC4448_LOBE_LANEC_0–Stage08–488/FC4448_LOBE_LANEC_0–Stage08–488DoG TL700_700BR1400_14003D.png</a></p>
 </div>
@@ -1560,34 +1563,34 @@ $(document).ready(function () {
 </div>
 <div id="overlay-19" class="section level4">
 <h4>overlay</h4>
-<p><img src="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647DoG%20Overlay%20ChainFiltered.png" /></p>
-<p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647DoG%20Overlay%20ChainFiltered.png">procimage/FC4448_LOBE_LANEC_0–Stage08–647/FC4448_LOBE_LANEC_0–Stage08–647DoG Overlay ChainFiltered.png</a></p>
+<p><img src="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647DoG%20Overlay%20Filtered.png" /></p>
+<p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647DoG%20Overlay%20Filtered.png">procimage/FC4448_LOBE_LANEC_0–Stage08–647/FC4448_LOBE_LANEC_0–Stage08–647DoG Overlay Filtered.png</a></p>
 </div>
 <div id="multiple-threshold-techniques-on-filtered-image-19" class="section level4">
 <h4>multiple threshold techniques on filtered image</h4>
 <center>
-<img src="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647DoGThreshAlgs.png" />
+<img src="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647DoGThreshAlgs.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647DoGThreshAlgs.png">procimage/FC4448_LOBE_LANEC_0–Stage08–647/FC4448_LOBE_LANEC_0–Stage08–647DoGThreshAlgs.png</a></p>
 </div>
 <div id="sub-area-tl-109-4-br-249-128-19" class="section level4">
 <h4>sub area TL (109, 4) BR (249, 128)</h4>
 <center>
-<img src="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647DoG%20TL109_4BR249_1283D.png" />
+<img src="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647DoG%20TL109_4BR249_1283D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647DoG%20TL109_4BR249_1283D.png">procimage/FC4448_LOBE_LANEC_0–Stage08–647/FC4448_LOBE_LANEC_0–Stage08–647DoG TL109_4BR249_1283D.png</a></p>
 </div>
 <div id="sub-area-tl-724-775-br-836-871-19" class="section level4">
 <h4>sub area TL (724, 775) BR (836, 871)</h4>
 <center>
-<img src="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647DoG%20TL724_775BR836_8713D.png" />
+<img src="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647DoG%20TL724_775BR836_8713D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647DoG%20TL724_775BR836_8713D.png">procimage/FC4448_LOBE_LANEC_0–Stage08–647/FC4448_LOBE_LANEC_0–Stage08–647DoG TL724_775BR836_8713D.png</a></p>
 </div>
 <div id="sub-area-tl-700-700-br-1400-1400-19" class="section level4">
 <h4>sub area TL (700, 700) BR (1400, 1400)</h4>
 <center>
-<img src="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647DoG%20TL700_700BR1400_14003D.png" />
+<img src="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647DoG%20TL700_700BR1400_14003D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4448_LOBE_LANEC_0--Stage08--647/FC4448_LOBE_LANEC_0--Stage08--647DoG%20TL700_700BR1400_14003D.png">procimage/FC4448_LOBE_LANEC_0–Stage08–647/FC4448_LOBE_LANEC_0–Stage08–647DoG TL700_700BR1400_14003D.png</a></p>
 </div>
@@ -1611,34 +1614,34 @@ $(document).ready(function () {
 </div>
 <div id="overlay-20" class="section level4">
 <h4>overlay</h4>
-<p><img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488DoG%20Overlay%20ChainFiltered.png" /></p>
-<p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488DoG%20Overlay%20ChainFiltered.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–488/FC4573_LOBE01_LANEA_0–Stage08–488DoG Overlay ChainFiltered.png</a></p>
+<p><img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488DoG%20Overlay%20Filtered.png" /></p>
+<p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488DoG%20Overlay%20Filtered.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–488/FC4573_LOBE01_LANEA_0–Stage08–488DoG Overlay Filtered.png</a></p>
 </div>
 <div id="multiple-threshold-techniques-on-filtered-image-20" class="section level4">
 <h4>multiple threshold techniques on filtered image</h4>
 <center>
-<img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488DoGThreshAlgs.png" />
+<img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488DoGThreshAlgs.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488DoGThreshAlgs.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–488/FC4573_LOBE01_LANEA_0–Stage08–488DoGThreshAlgs.png</a></p>
 </div>
 <div id="sub-area-tl-109-4-br-249-128-20" class="section level4">
 <h4>sub area TL (109, 4) BR (249, 128)</h4>
 <center>
-<img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488DoG%20TL109_4BR249_1283D.png" />
+<img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488DoG%20TL109_4BR249_1283D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488DoG%20TL109_4BR249_1283D.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–488/FC4573_LOBE01_LANEA_0–Stage08–488DoG TL109_4BR249_1283D.png</a></p>
 </div>
 <div id="sub-area-tl-724-775-br-836-871-20" class="section level4">
 <h4>sub area TL (724, 775) BR (836, 871)</h4>
 <center>
-<img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488DoG%20TL724_775BR836_8713D.png" />
+<img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488DoG%20TL724_775BR836_8713D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488DoG%20TL724_775BR836_8713D.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–488/FC4573_LOBE01_LANEA_0–Stage08–488DoG TL724_775BR836_8713D.png</a></p>
 </div>
 <div id="sub-area-tl-700-700-br-1400-1400-20" class="section level4">
 <h4>sub area TL (700, 700) BR (1400, 1400)</h4>
 <center>
-<img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488DoG%20TL700_700BR1400_14003D.png" />
+<img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488DoG%20TL700_700BR1400_14003D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--488/FC4573_LOBE01_LANEA_0--Stage08--488DoG%20TL700_700BR1400_14003D.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–488/FC4573_LOBE01_LANEA_0–Stage08–488DoG TL700_700BR1400_14003D.png</a></p>
 </div>
@@ -1662,34 +1665,34 @@ $(document).ready(function () {
 </div>
 <div id="overlay-21" class="section level4">
 <h4>overlay</h4>
-<p><img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647DoG%20Overlay%20ChainFiltered.png" /></p>
-<p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647DoG%20Overlay%20ChainFiltered.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–647/FC4573_LOBE01_LANEA_0–Stage08–647DoG Overlay ChainFiltered.png</a></p>
+<p><img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647DoG%20Overlay%20Filtered.png" /></p>
+<p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647DoG%20Overlay%20Filtered.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–647/FC4573_LOBE01_LANEA_0–Stage08–647DoG Overlay Filtered.png</a></p>
 </div>
 <div id="multiple-threshold-techniques-on-filtered-image-21" class="section level4">
 <h4>multiple threshold techniques on filtered image</h4>
 <center>
-<img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647DoGThreshAlgs.png" />
+<img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647DoGThreshAlgs.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647DoGThreshAlgs.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–647/FC4573_LOBE01_LANEA_0–Stage08–647DoGThreshAlgs.png</a></p>
 </div>
 <div id="sub-area-tl-109-4-br-249-128-21" class="section level4">
 <h4>sub area TL (109, 4) BR (249, 128)</h4>
 <center>
-<img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647DoG%20TL109_4BR249_1283D.png" />
+<img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647DoG%20TL109_4BR249_1283D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647DoG%20TL109_4BR249_1283D.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–647/FC4573_LOBE01_LANEA_0–Stage08–647DoG TL109_4BR249_1283D.png</a></p>
 </div>
 <div id="sub-area-tl-724-775-br-836-871-21" class="section level4">
 <h4>sub area TL (724, 775) BR (836, 871)</h4>
 <center>
-<img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647DoG%20TL724_775BR836_8713D.png" />
+<img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647DoG%20TL724_775BR836_8713D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647DoG%20TL724_775BR836_8713D.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–647/FC4573_LOBE01_LANEA_0–Stage08–647DoG TL724_775BR836_8713D.png</a></p>
 </div>
 <div id="sub-area-tl-700-700-br-1400-1400-21" class="section level4">
 <h4>sub area TL (700, 700) BR (1400, 1400)</h4>
 <center>
-<img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647DoG%20TL700_700BR1400_14003D.png" />
+<img src="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647DoG%20TL700_700BR1400_14003D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4573_LOBE01_LANEA_0--Stage08--647/FC4573_LOBE01_LANEA_0--Stage08--647DoG%20TL700_700BR1400_14003D.png">procimage/FC4573_LOBE01_LANEA_0–Stage08–647/FC4573_LOBE01_LANEA_0–Stage08–647DoG TL700_700BR1400_14003D.png</a></p>
 </div>
@@ -1713,34 +1716,34 @@ $(document).ready(function () {
 </div>
 <div id="overlay-22" class="section level4">
 <h4>overlay</h4>
-<p><img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488DoG%20Overlay%20ChainFiltered.png" /></p>
-<p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488DoG%20Overlay%20ChainFiltered.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–488/FC4575_LOBE01_LANEB_0–Stage17–488DoG Overlay ChainFiltered.png</a></p>
+<p><img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488DoG%20Overlay%20Filtered.png" /></p>
+<p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488DoG%20Overlay%20Filtered.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–488/FC4575_LOBE01_LANEB_0–Stage17–488DoG Overlay Filtered.png</a></p>
 </div>
 <div id="multiple-threshold-techniques-on-filtered-image-22" class="section level4">
 <h4>multiple threshold techniques on filtered image</h4>
 <center>
-<img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488DoGThreshAlgs.png" />
+<img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488DoGThreshAlgs.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488DoGThreshAlgs.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–488/FC4575_LOBE01_LANEB_0–Stage17–488DoGThreshAlgs.png</a></p>
 </div>
 <div id="sub-area-tl-109-4-br-249-128-22" class="section level4">
 <h4>sub area TL (109, 4) BR (249, 128)</h4>
 <center>
-<img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488DoG%20TL109_4BR249_1283D.png" />
+<img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488DoG%20TL109_4BR249_1283D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488DoG%20TL109_4BR249_1283D.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–488/FC4575_LOBE01_LANEB_0–Stage17–488DoG TL109_4BR249_1283D.png</a></p>
 </div>
 <div id="sub-area-tl-724-775-br-836-871-22" class="section level4">
 <h4>sub area TL (724, 775) BR (836, 871)</h4>
 <center>
-<img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488DoG%20TL724_775BR836_8713D.png" />
+<img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488DoG%20TL724_775BR836_8713D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488DoG%20TL724_775BR836_8713D.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–488/FC4575_LOBE01_LANEB_0–Stage17–488DoG TL724_775BR836_8713D.png</a></p>
 </div>
 <div id="sub-area-tl-700-700-br-1400-1400-22" class="section level4">
 <h4>sub area TL (700, 700) BR (1400, 1400)</h4>
 <center>
-<img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488DoG%20TL700_700BR1400_14003D.png" />
+<img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488DoG%20TL700_700BR1400_14003D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--488/FC4575_LOBE01_LANEB_0--Stage17--488DoG%20TL700_700BR1400_14003D.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–488/FC4575_LOBE01_LANEB_0–Stage17–488DoG TL700_700BR1400_14003D.png</a></p>
 </div>
@@ -1764,34 +1767,34 @@ $(document).ready(function () {
 </div>
 <div id="overlay-23" class="section level4">
 <h4>overlay</h4>
-<p><img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647DoG%20Overlay%20ChainFiltered.png" /></p>
-<p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647DoG%20Overlay%20ChainFiltered.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–647/FC4575_LOBE01_LANEB_0–Stage17–647DoG Overlay ChainFiltered.png</a></p>
+<p><img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647DoG%20Overlay%20Filtered.png" /></p>
+<p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647DoG%20Overlay%20Filtered.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–647/FC4575_LOBE01_LANEB_0–Stage17–647DoG Overlay Filtered.png</a></p>
 </div>
 <div id="multiple-threshold-techniques-on-filtered-image-23" class="section level4">
 <h4>multiple threshold techniques on filtered image</h4>
 <center>
-<img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647DoGThreshAlgs.png" />
+<img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647DoGThreshAlgs.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647DoGThreshAlgs.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–647/FC4575_LOBE01_LANEB_0–Stage17–647DoGThreshAlgs.png</a></p>
 </div>
 <div id="sub-area-tl-109-4-br-249-128-23" class="section level4">
 <h4>sub area TL (109, 4) BR (249, 128)</h4>
 <center>
-<img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647DoG%20TL109_4BR249_1283D.png" />
+<img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647DoG%20TL109_4BR249_1283D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647DoG%20TL109_4BR249_1283D.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–647/FC4575_LOBE01_LANEB_0–Stage17–647DoG TL109_4BR249_1283D.png</a></p>
 </div>
 <div id="sub-area-tl-724-775-br-836-871-23" class="section level4">
 <h4>sub area TL (724, 775) BR (836, 871)</h4>
 <center>
-<img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647DoG%20TL724_775BR836_8713D.png" />
+<img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647DoG%20TL724_775BR836_8713D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647DoG%20TL724_775BR836_8713D.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–647/FC4575_LOBE01_LANEB_0–Stage17–647DoG TL724_775BR836_8713D.png</a></p>
 </div>
 <div id="sub-area-tl-700-700-br-1400-1400-23" class="section level4">
 <h4>sub area TL (700, 700) BR (1400, 1400)</h4>
 <center>
-<img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647DoG%20TL700_700BR1400_14003D.png" />
+<img src="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647DoG%20TL700_700BR1400_14003D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4575_LOBE01_LANEB_0--Stage17--647/FC4575_LOBE01_LANEB_0--Stage17--647DoG%20TL700_700BR1400_14003D.png">procimage/FC4575_LOBE01_LANEB_0–Stage17–647/FC4575_LOBE01_LANEB_0–Stage17–647DoG TL700_700BR1400_14003D.png</a></p>
 </div>
@@ -1815,34 +1818,34 @@ $(document).ready(function () {
 </div>
 <div id="overlay-24" class="section level4">
 <h4>overlay</h4>
-<p><img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488DoG%20Overlay%20ChainFiltered.png" /></p>
-<p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488DoG%20Overlay%20ChainFiltered.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–488/FC4575_LOBE02_LANEB_0–Stage17–488DoG Overlay ChainFiltered.png</a></p>
+<p><img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488DoG%20Overlay%20Filtered.png" /></p>
+<p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488DoG%20Overlay%20Filtered.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–488/FC4575_LOBE02_LANEB_0–Stage17–488DoG Overlay Filtered.png</a></p>
 </div>
 <div id="multiple-threshold-techniques-on-filtered-image-24" class="section level4">
 <h4>multiple threshold techniques on filtered image</h4>
 <center>
-<img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488DoGThreshAlgs.png" />
+<img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488DoGThreshAlgs.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488DoGThreshAlgs.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–488/FC4575_LOBE02_LANEB_0–Stage17–488DoGThreshAlgs.png</a></p>
 </div>
 <div id="sub-area-tl-109-4-br-249-128-24" class="section level4">
 <h4>sub area TL (109, 4) BR (249, 128)</h4>
 <center>
-<img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488DoG%20TL109_4BR249_1283D.png" />
+<img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488DoG%20TL109_4BR249_1283D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488DoG%20TL109_4BR249_1283D.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–488/FC4575_LOBE02_LANEB_0–Stage17–488DoG TL109_4BR249_1283D.png</a></p>
 </div>
 <div id="sub-area-tl-724-775-br-836-871-24" class="section level4">
 <h4>sub area TL (724, 775) BR (836, 871)</h4>
 <center>
-<img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488DoG%20TL724_775BR836_8713D.png" />
+<img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488DoG%20TL724_775BR836_8713D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488DoG%20TL724_775BR836_8713D.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–488/FC4575_LOBE02_LANEB_0–Stage17–488DoG TL724_775BR836_8713D.png</a></p>
 </div>
 <div id="sub-area-tl-700-700-br-1400-1400-24" class="section level4">
 <h4>sub area TL (700, 700) BR (1400, 1400)</h4>
 <center>
-<img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488DoG%20TL700_700BR1400_14003D.png" />
+<img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488DoG%20TL700_700BR1400_14003D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--488/FC4575_LOBE02_LANEB_0--Stage17--488DoG%20TL700_700BR1400_14003D.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–488/FC4575_LOBE02_LANEB_0–Stage17–488DoG TL700_700BR1400_14003D.png</a></p>
 </div>
@@ -1866,34 +1869,34 @@ $(document).ready(function () {
 </div>
 <div id="overlay-25" class="section level4">
 <h4>overlay</h4>
-<p><img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647DoG%20Overlay%20ChainFiltered.png" /></p>
-<p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647DoG%20Overlay%20ChainFiltered.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–647/FC4575_LOBE02_LANEB_0–Stage17–647DoG Overlay ChainFiltered.png</a></p>
+<p><img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647DoG%20Overlay%20Filtered.png" /></p>
+<p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647DoG%20Overlay%20Filtered.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–647/FC4575_LOBE02_LANEB_0–Stage17–647DoG Overlay Filtered.png</a></p>
 </div>
 <div id="multiple-threshold-techniques-on-filtered-image-25" class="section level4">
 <h4>multiple threshold techniques on filtered image</h4>
 <center>
-<img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647DoGThreshAlgs.png" />
+<img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647DoGThreshAlgs.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647DoGThreshAlgs.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–647/FC4575_LOBE02_LANEB_0–Stage17–647DoGThreshAlgs.png</a></p>
 </div>
 <div id="sub-area-tl-109-4-br-249-128-25" class="section level4">
 <h4>sub area TL (109, 4) BR (249, 128)</h4>
 <center>
-<img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647DoG%20TL109_4BR249_1283D.png" />
+<img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647DoG%20TL109_4BR249_1283D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647DoG%20TL109_4BR249_1283D.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–647/FC4575_LOBE02_LANEB_0–Stage17–647DoG TL109_4BR249_1283D.png</a></p>
 </div>
 <div id="sub-area-tl-724-775-br-836-871-25" class="section level4">
 <h4>sub area TL (724, 775) BR (836, 871)</h4>
 <center>
-<img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647DoG%20TL724_775BR836_8713D.png" />
+<img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647DoG%20TL724_775BR836_8713D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647DoG%20TL724_775BR836_8713D.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–647/FC4575_LOBE02_LANEB_0–Stage17–647DoG TL724_775BR836_8713D.png</a></p>
 </div>
 <div id="sub-area-tl-700-700-br-1400-1400-25" class="section level4">
 <h4>sub area TL (700, 700) BR (1400, 1400)</h4>
 <center>
-<img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647DoG%20TL700_700BR1400_14003D.png" />
+<img src="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647DoG%20TL700_700BR1400_14003D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4575_LOBE02_LANEB_0--Stage17--647/FC4575_LOBE02_LANEB_0--Stage17--647DoG%20TL700_700BR1400_14003D.png">procimage/FC4575_LOBE02_LANEB_0–Stage17–647/FC4575_LOBE02_LANEB_0–Stage17–647DoG TL700_700BR1400_14003D.png</a></p>
 </div>
@@ -1917,34 +1920,34 @@ $(document).ready(function () {
 </div>
 <div id="overlay-26" class="section level4">
 <h4>overlay</h4>
-<p><img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488DoG%20Overlay%20ChainFiltered.png" /></p>
-<p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488DoG%20Overlay%20ChainFiltered.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–488/FC4899_LOBE_01__LANEB_0–Stage08–488DoG Overlay ChainFiltered.png</a></p>
+<p><img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488DoG%20Overlay%20Filtered.png" /></p>
+<p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488DoG%20Overlay%20Filtered.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–488/FC4899_LOBE_01__LANEB_0–Stage08–488DoG Overlay Filtered.png</a></p>
 </div>
 <div id="multiple-threshold-techniques-on-filtered-image-26" class="section level4">
 <h4>multiple threshold techniques on filtered image</h4>
 <center>
-<img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488DoGThreshAlgs.png" />
+<img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488DoGThreshAlgs.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488DoGThreshAlgs.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–488/FC4899_LOBE_01__LANEB_0–Stage08–488DoGThreshAlgs.png</a></p>
 </div>
 <div id="sub-area-tl-109-4-br-249-128-26" class="section level4">
 <h4>sub area TL (109, 4) BR (249, 128)</h4>
 <center>
-<img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488DoG%20TL109_4BR249_1283D.png" />
+<img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488DoG%20TL109_4BR249_1283D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488DoG%20TL109_4BR249_1283D.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–488/FC4899_LOBE_01__LANEB_0–Stage08–488DoG TL109_4BR249_1283D.png</a></p>
 </div>
 <div id="sub-area-tl-724-775-br-836-871-26" class="section level4">
 <h4>sub area TL (724, 775) BR (836, 871)</h4>
 <center>
-<img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488DoG%20TL724_775BR836_8713D.png" />
+<img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488DoG%20TL724_775BR836_8713D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488DoG%20TL724_775BR836_8713D.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–488/FC4899_LOBE_01__LANEB_0–Stage08–488DoG TL724_775BR836_8713D.png</a></p>
 </div>
 <div id="sub-area-tl-700-700-br-1400-1400-26" class="section level4">
 <h4>sub area TL (700, 700) BR (1400, 1400)</h4>
 <center>
-<img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488DoG%20TL700_700BR1400_14003D.png" />
+<img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488DoG%20TL700_700BR1400_14003D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--488/FC4899_LOBE_01__LANEB_0--Stage08--488DoG%20TL700_700BR1400_14003D.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–488/FC4899_LOBE_01__LANEB_0–Stage08–488DoG TL700_700BR1400_14003D.png</a></p>
 </div>
@@ -1968,37 +1971,37 @@ $(document).ready(function () {
 </div>
 <div id="overlay-27" class="section level4">
 <h4>overlay</h4>
-<p><img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647DoG%20Overlay%20ChainFiltered.png" /></p>
-<p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647DoG%20Overlay%20ChainFiltered.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–647/FC4899_LOBE_01__LANEB_0–Stage08–647DoG Overlay ChainFiltered.png</a></p>
+<p><img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647DoG%20Overlay%20Filtered.png" /></p>
+<p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647DoG%20Overlay%20Filtered.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–647/FC4899_LOBE_01__LANEB_0–Stage08–647DoG Overlay Filtered.png</a></p>
 </div>
 <div id="multiple-threshold-techniques-on-filtered-image-27" class="section level4">
 <h4>multiple threshold techniques on filtered image</h4>
 <center>
-<img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647DoGThreshAlgs.png" />
+<img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647DoGThreshAlgs.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647DoGThreshAlgs.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–647/FC4899_LOBE_01__LANEB_0–Stage08–647DoGThreshAlgs.png</a></p>
 </div>
 <div id="sub-area-tl-109-4-br-249-128-27" class="section level4">
 <h4>sub area TL (109, 4) BR (249, 128)</h4>
 <center>
-<img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647DoG%20TL109_4BR249_1283D.png" />
+<img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647DoG%20TL109_4BR249_1283D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647DoG%20TL109_4BR249_1283D.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–647/FC4899_LOBE_01__LANEB_0–Stage08–647DoG TL109_4BR249_1283D.png</a></p>
 </div>
 <div id="sub-area-tl-724-775-br-836-871-27" class="section level4">
 <h4>sub area TL (724, 775) BR (836, 871)</h4>
 <center>
-<img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647DoG%20TL724_775BR836_8713D.png" />
+<img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647DoG%20TL724_775BR836_8713D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647DoG%20TL724_775BR836_8713D.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–647/FC4899_LOBE_01__LANEB_0–Stage08–647DoG TL724_775BR836_8713D.png</a></p>
 </div>
 <div id="sub-area-tl-700-700-br-1400-1400-27" class="section level4">
 <h4>sub area TL (700, 700) BR (1400, 1400)</h4>
 <center>
-<img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647DoG%20TL700_700BR1400_14003D.png" />
+<img src="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647DoG%20TL700_700BR1400_14003D.png" style="width:90.0%" />
 </center>
 <p>View full image <a href="procimage/FC4899_LOBE_01__LANEB_0--Stage08--647/FC4899_LOBE_01__LANEB_0--Stage08--647DoG%20TL700_700BR1400_14003D.png">procimage/FC4899_LOBE_01__LANEB_0–Stage08–647/FC4899_LOBE_01__LANEB_0–Stage08–647DoG TL700_700BR1400_14003D.png</a></p>
-<p>Time for this code chunk to run: 7.232 s</p>
+<p>Time for this code chunk to run: 7.4 s</p>
 </div>
 </div>
 </div>

@@ -351,6 +351,9 @@ $(document).ready(function () {
   <a href="Filter.html">Simple Filters</a>
 </li>
 <li>
+  <a href="FFT.html">FFT</a>
+</li>
+<li>
   <a href="about.html">About</a>
 </li>
       </ul>
@@ -404,50 +407,99 @@ $(document).ready(function () {
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> math <span class="im">import</span> sqrt</span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> skimage.feature <span class="im">import</span> blob_dog, blob_log, blob_doh</span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Simple rowMultiplication used in pad </span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>rowMult<span class="op">=</span> <span class="kw">lambda</span> Mat,theRow,xv,yv: Mat[theRow,<span class="dv">0</span>]<span class="op">*</span>xv<span class="op">+</span>Mat[theRow,<span class="dv">1</span>]<span class="op">*</span>yv<span class="op">+</span>Mat[theRow,<span class="dv">2</span>]</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> gridBorders(theSums,perc):</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  percen<span class="op">=</span>np.percentile(theSums,perc)</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  matchingX<span class="op">=</span>np.arange(<span class="dv">0</span>,<span class="bu">len</span>(theSums))[theSums<span class="op">&lt;</span>percen]</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  arr<span class="op">=</span>np.array(matchingX[<span class="dv">0</span>])</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> i <span class="kw">in</span> np.arange(<span class="dv">1</span>,<span class="bu">len</span>(matchingX)):</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> matchingX[i]<span class="op">-</span>matchingX[i<span class="op">-</span><span class="dv">1</span>]<span class="op">!=</span><span class="dv">1</span>:</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>      arr<span class="op">=</span>np.append(arr,[matchingX[i<span class="op">-</span><span class="dv">1</span>],matchingX[i]])</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  arr<span class="op">=</span>np.append(arr,matchingX[i])</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span>(arr)</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ScaledImage(inImage,lower<span class="op">=</span><span class="dv">0</span>,upper<span class="op">=</span><span class="dv">255</span>,maxVal<span class="op">=</span><span class="dv">255</span>,invert<span class="op">=</span><span class="va">True</span>):</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    greyFac<span class="op">=</span>maxVal<span class="op">/</span>(upper<span class="op">-</span>lower)</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    img<span class="op">=</span>np.clip(np.floor(greyFac<span class="op">*</span>(inImage<span class="op">-</span>lower)),<span class="dv">0</span>,maxVal)</span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> invert:</span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>      img<span class="op">=</span>maxVal<span class="op">-</span>img</span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span>(img)</span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> PercentileScaledImage(inImage,lowerPerc<span class="op">=</span><span class="fl">0.1</span>,upperPerc<span class="op">=</span><span class="fl">99.9</span>,maxVal<span class="op">=</span><span class="dv">255</span>,invert<span class="op">=</span><span class="va">True</span>):</span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    lower,upper<span class="op">=</span>np.percentile(inImage,(lowerPerc,upperPerc))</span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span>(ScaledImage(inImage,lower<span class="op">=</span>lower,upper<span class="op">=</span>upper,maxVal<span class="op">=</span>maxVal,invert<span class="op">=</span>invert))</span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> PercentileScaledImageToImage(inImage,scaleRef,lowerPerc<span class="op">=</span><span class="fl">0.1</span>,upperPerc<span class="op">=</span><span class="fl">99.9</span>,maxVal<span class="op">=</span><span class="dv">255</span>,invert<span class="op">=</span><span class="va">True</span>):</span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>    lower,upper<span class="op">=</span>np.percentile(scaleRef,(lowerPerc,upperPerc))</span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span>(ScaledImage(inImage,lower<span class="op">=</span>lower,upper<span class="op">=</span>upper,maxVal<span class="op">=</span>maxVal,invert<span class="op">=</span>invert))</span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>numPads<span class="op">=</span><span class="dv">123</span> <span class="co"># got this from counting peaks in a subArea. image 488</span></span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>interpad<span class="op">=</span><span class="dv">5</span>  <span class="co"># got this from measuring between peaks in a subArea. image 488</span></span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>min_sigma<span class="op">=</span><span class="dv">1</span></span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>max_sigma<span class="op">=</span><span class="dv">3</span></span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>threshFac<span class="op">=</span><span class="fl">0.1</span></span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="co"># TL,TR,BR,BL</span></span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="co"># manually selected from FC3344_LOBE_LANEA_0--Stage20--488 image. The points were created by clicking on pad centres so the grid is widened by interpad.</span></span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>patches<span class="op">=</span>{</span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;Patch 1&quot;</span>:np.array([[<span class="dv">461</span><span class="op">-</span>interpad,<span class="dv">621</span><span class="op">-</span>interpad],[<span class="dv">1082</span><span class="op">+</span>interpad,<span class="dv">625</span><span class="op">-</span>interpad],[<span class="dv">1077</span><span class="op">+</span>interpad,<span class="dv">1246</span><span class="op">+</span>interpad],[<span class="dv">457</span><span class="op">-</span>interpad,<span class="dv">1241</span><span class="op">+</span>interpad]],np.int32),</span>
-<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;Patch 2&quot;</span>:np.array([[<span class="dv">1150</span><span class="op">-</span>interpad,<span class="dv">626</span><span class="op">-</span>interpad],[<span class="dv">1771</span><span class="op">+</span>interpad,<span class="dv">630</span><span class="op">-</span>interpad],[<span class="dv">1767</span><span class="op">+</span>interpad,<span class="dv">1252</span><span class="op">+</span>interpad],[<span class="dv">1145</span><span class="op">-</span>interpad,<span class="dv">1246</span><span class="op">+</span>interpad]],np.int32),</span>
-<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;Patch 3&quot;</span>:np.array([[<span class="dv">456</span><span class="op">-</span>interpad,<span class="dv">1310</span><span class="op">-</span>interpad],[<span class="dv">1077</span><span class="op">+</span>interpad,<span class="dv">1314</span><span class="op">-</span>interpad],[<span class="dv">1072</span><span class="op">+</span>interpad,<span class="dv">1935</span><span class="op">+</span>interpad],[<span class="dv">450</span><span class="op">-</span>interpad,<span class="dv">1932</span><span class="op">+</span>interpad]],np.int32),</span>
-<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;Patch 4&quot;</span>:np.array([[<span class="dv">1145</span><span class="op">-</span>interpad,<span class="dv">1315</span><span class="op">-</span>interpad],[<span class="dv">1766</span><span class="op">+</span>interpad,<span class="dv">1319</span><span class="op">-</span>interpad],[<span class="dv">1763</span><span class="op">+</span>interpad,<span class="dv">1942</span><span class="op">+</span>interpad],[<span class="dv">1141</span><span class="op">-</span>interpad,<span class="dv">1936</span><span class="op">+</span>interpad]],np.int32)</span>
-<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>numPads<span class="op">=</span><span class="dv">123</span> <span class="co"># got this from counting peaks in a subArea. image 488</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>interpad<span class="op">=</span><span class="dv">5</span>  <span class="co"># got this from measuring between peaks in a subArea. image 488</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>min_sigma<span class="op">=</span><span class="dv">1</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>max_sigma<span class="op">=</span><span class="dv">3</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>threshFac<span class="op">=</span><span class="fl">0.1</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="co"># TL,TR,BR,BL</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="co"># manually selected from FC3344_LOBE_LANEA_0--Stage20--488 image. The points were created by clicking on pad centres so the grid is widened by interpad.</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>patches<span class="op">=</span>{</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;Patch 1&quot;</span>:np.array([[<span class="dv">461</span><span class="op">-</span>interpad,<span class="dv">621</span><span class="op">-</span>interpad],[<span class="dv">1082</span><span class="op">+</span>interpad,<span class="dv">625</span><span class="op">-</span>interpad],[<span class="dv">1077</span><span class="op">+</span>interpad,<span class="dv">1246</span><span class="op">+</span>interpad],[<span class="dv">457</span><span class="op">-</span>interpad,<span class="dv">1241</span><span class="op">+</span>interpad]],np.int32),</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;Patch 2&quot;</span>:np.array([[<span class="dv">1150</span><span class="op">-</span>interpad,<span class="dv">626</span><span class="op">-</span>interpad],[<span class="dv">1771</span><span class="op">+</span>interpad,<span class="dv">630</span><span class="op">-</span>interpad],[<span class="dv">1767</span><span class="op">+</span>interpad,<span class="dv">1252</span><span class="op">+</span>interpad],[<span class="dv">1145</span><span class="op">-</span>interpad,<span class="dv">1246</span><span class="op">+</span>interpad]],np.int32),</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;Patch 3&quot;</span>:np.array([[<span class="dv">456</span><span class="op">-</span>interpad,<span class="dv">1310</span><span class="op">-</span>interpad],[<span class="dv">1077</span><span class="op">+</span>interpad,<span class="dv">1314</span><span class="op">-</span>interpad],[<span class="dv">1072</span><span class="op">+</span>interpad,<span class="dv">1935</span><span class="op">+</span>interpad],[<span class="dv">450</span><span class="op">-</span>interpad,<span class="dv">1932</span><span class="op">+</span>interpad]],np.int32),</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;Patch 4&quot;</span>:np.array([[<span class="dv">1145</span><span class="op">-</span>interpad,<span class="dv">1315</span><span class="op">-</span>interpad],[<span class="dv">1766</span><span class="op">+</span>interpad,<span class="dv">1319</span><span class="op">-</span>interpad],[<span class="dv">1763</span><span class="op">+</span>interpad,<span class="dv">1942</span><span class="op">+</span>interpad],[<span class="dv">1141</span><span class="op">-</span>interpad,<span class="dv">1936</span><span class="op">+</span>interpad]],np.int32)</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Simple rowMultiplication used in pad </span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>rowMult<span class="op">=</span> <span class="kw">lambda</span> Mat,theRow,xv,yv: Mat[theRow,<span class="dv">0</span>]<span class="op">*</span>xv<span class="op">+</span>Mat[theRow,<span class="dv">1</span>]<span class="op">*</span>yv<span class="op">+</span>Mat[theRow,<span class="dv">2</span>]</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> gridBorders(theSums,perc):</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>  percen<span class="op">=</span>np.percentile(theSums,perc)</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>  matchingX<span class="op">=</span>np.arange(<span class="dv">0</span>,<span class="bu">len</span>(theSums))[theSums<span class="op">&lt;</span>percen]</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>  arr<span class="op">=</span>np.array(matchingX[<span class="dv">0</span>])</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> i <span class="kw">in</span> np.arange(<span class="dv">1</span>,<span class="bu">len</span>(matchingX)):</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> matchingX[i]<span class="op">-</span>matchingX[i<span class="op">-</span><span class="dv">1</span>]<span class="op">!=</span><span class="dv">1</span>:</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>      arr<span class="op">=</span>np.append(arr,[matchingX[i<span class="op">-</span><span class="dv">1</span>],matchingX[i]])</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>  arr<span class="op">=</span>np.append(arr,matchingX[i])</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span>(arr)</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ScaledImage(inImage,lower<span class="op">=</span><span class="dv">0</span>,upper<span class="op">=</span><span class="dv">255</span>,maxVal<span class="op">=</span><span class="dv">255</span>,invert<span class="op">=</span><span class="va">True</span>):</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>    greyFac<span class="op">=</span>maxVal<span class="op">/</span>(upper<span class="op">-</span>lower)</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>    img<span class="op">=</span>np.clip(np.floor(greyFac<span class="op">*</span>(inImage<span class="op">-</span>lower)),<span class="dv">0</span>,maxVal)</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> invert:</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>      img<span class="op">=</span>maxVal<span class="op">-</span>img</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span>(img)</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> PercentileScaledImage(inImage,lowerPerc<span class="op">=</span><span class="fl">0.1</span>,upperPerc<span class="op">=</span><span class="fl">99.9</span>,maxVal<span class="op">=</span><span class="dv">255</span>,invert<span class="op">=</span><span class="va">True</span>):</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>    lower,upper<span class="op">=</span>np.percentile(inImage,(lowerPerc,upperPerc))</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span>(ScaledImage(inImage,lower<span class="op">=</span>lower,upper<span class="op">=</span>upper,maxVal<span class="op">=</span>maxVal,invert<span class="op">=</span>invert))</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> PercentileScaledImageToImage(inImage,scaleRef,lowerPerc<span class="op">=</span><span class="fl">0.1</span>,upperPerc<span class="op">=</span><span class="fl">99.9</span>,maxVal<span class="op">=</span><span class="dv">255</span>,invert<span class="op">=</span><span class="va">True</span>):</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>    lower,upper<span class="op">=</span>np.percentile(scaleRef,(lowerPerc,upperPerc))</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span>(ScaledImage(inImage,lower<span class="op">=</span>lower,upper<span class="op">=</span>upper,maxVal<span class="op">=</span>maxVal,invert<span class="op">=</span>invert))</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> SaveImageAndMarkdown(imagePath,theImage,descript):</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span>(<span class="st">&quot;</span><span class="ch">\n\n</span><span class="st">&quot;</span><span class="op">+</span>descript<span class="op">+</span><span class="st">&quot;</span><span class="ch">\n\n</span><span class="st">&quot;</span>)</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>  ok<span class="op">=</span>cv.imwrite(imagePath, theImage)</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span>(<span class="st">&quot;</span><span class="ch">\n\n</span><span class="st">![](&quot;</span><span class="op">+</span>imagePath<span class="op">+</span><span class="st">&quot;)</span><span class="ch">\n\n</span><span class="st">&quot;</span>)</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span>(<span class="st">&quot;</span><span class="ch">\n\n</span><span class="st">View full image [&quot;</span><span class="op">+</span>imagePath<span class="op">+</span><span class="st">&quot;](&quot;</span><span class="op">+</span>imagePath<span class="op">+</span><span class="st">&quot;)</span><span class="ch">\n\n</span><span class="st">&quot;</span>)</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> SavePlotAndMarkdown(imagePath,descript):</span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span>(<span class="st">&quot;</span><span class="ch">\n\n</span><span class="st">&quot;</span><span class="op">+</span>descript<span class="op">+</span><span class="st">&quot;</span><span class="ch">\n\n</span><span class="st">&quot;</span>)</span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>  plt.savefig(imagePath)<span class="op">;</span></span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span>(<span class="st">&quot;</span><span class="ch">\n</span><span class="st">&lt;center&gt;</span><span class="ch">\n</span><span class="st">![](&quot;</span><span class="op">+</span>imagePath<span class="op">+</span><span class="st">&quot;){width=90%}</span><span class="ch">\n</span><span class="st">&lt;/center&gt;</span><span class="ch">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span>(<span class="st">&quot;</span><span class="ch">\n\n</span><span class="st">View full image [&quot;</span><span class="op">+</span>imagePath<span class="op">+</span><span class="st">&quot;](&quot;</span><span class="op">+</span>imagePath<span class="op">+</span><span class="st">&quot;)</span><span class="ch">\n\n</span><span class="st">&quot;</span>)</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> CompareSurfaces(img1,desc1,img2,desc2,TL<span class="op">=</span>(<span class="dv">0</span>,<span class="dv">0</span>),BR<span class="op">=</span>(<span class="dv">100</span>,<span class="dv">100</span>)):</span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a>  subImage1 <span class="op">=</span> img1[TL[<span class="dv">1</span>]:BR[<span class="dv">1</span>],TL[<span class="dv">0</span>]:BR[<span class="dv">0</span>]]</span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a>  subImage2 <span class="op">=</span> img2[TL[<span class="dv">1</span>]:BR[<span class="dv">1</span>],TL[<span class="dv">0</span>]:BR[<span class="dv">0</span>]]</span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a>  plotMin<span class="op">=</span>np.<span class="bu">min</span>((np.<span class="bu">min</span>(subImage1),np.<span class="bu">min</span>(subImage2)))</span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a>  plotMax<span class="op">=</span>np.<span class="bu">max</span>((np.<span class="bu">max</span>(subImage1),np.<span class="bu">max</span>(subImage2)))</span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a>  <span class="co"># create the x and y coordinate arrays (here we just use pixel indices)</span></span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a>  xx, yy <span class="op">=</span> np.mgrid[<span class="dv">0</span>:subImage1.shape[<span class="dv">0</span>], <span class="dv">0</span>:subImage1.shape[<span class="dv">1</span>]]</span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a>  <span class="co"># set up a figure twice as wide as it is tall</span></span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a>  fig <span class="op">=</span> plt.figure(figsize<span class="op">=</span>plt.figaspect(<span class="fl">0.5</span>))</span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a>  <span class="co">#===============</span></span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a>  <span class="co">#  First subplot</span></span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a>  <span class="co">#===============</span></span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a>  <span class="co"># set up the axes for the first plot</span></span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a>  ax <span class="op">=</span> fig.add_subplot(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">1</span>, projection<span class="op">=</span><span class="st">&#39;3d&#39;</span>)</span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a>  ax.set_title(desc1)</span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a>  surf <span class="op">=</span> ax.plot_surface(xx, yy, subImage1, rstride<span class="op">=</span><span class="dv">1</span>, cstride<span class="op">=</span><span class="dv">1</span>, cmap<span class="op">=</span>plt.cm.jet,</span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a>                       linewidth<span class="op">=</span><span class="dv">0</span>, antialiased<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a>  ax.set_zlim(plotMin, plotMax)</span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a>  <span class="co">#fig.colorbar(surf, shrink=0.5, aspect=10)</span></span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a>  <span class="co">#===============</span></span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Second subplot</span></span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a>  <span class="co">#===============</span></span>
+<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a>  <span class="co"># set up the axes for the second plot</span></span>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a>  ax <span class="op">=</span> fig.add_subplot(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">2</span>, projection<span class="op">=</span><span class="st">&#39;3d&#39;</span>)</span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a>  ax.set_title(desc2)</span>
+<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a>  surf <span class="op">=</span> ax.plot_surface(xx, yy, subImage2, rstride<span class="op">=</span><span class="dv">1</span>, cstride<span class="op">=</span><span class="dv">1</span>, cmap<span class="op">=</span>plt.cm.jet,</span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a>                       linewidth<span class="op">=</span><span class="dv">0</span>, antialiased<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a>  ax.set_zlim(plotMin, plotMax)</span></code></pre></div>
 </div>
 
 <hr><footer><p style="text-align:right;font-size: 10px;"><strong>CONFIDENTIAL</strong>. For attention of intended parties only.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>Standard Disclaimers Apply:</strong>&nbsp;&nbsp;All views are my own, use at your own risk.  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &copy;&nbsp;Copyright&nbsp;2021&nbsp;David&nbsp;Bramwell </p></footer>

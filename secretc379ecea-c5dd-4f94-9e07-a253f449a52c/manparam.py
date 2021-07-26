@@ -68,7 +68,7 @@ def SaveImageAndMarkdown(imagePath,theImage,descript):
 def SavePlotAndMarkdown(imagePath,descript):
   print("\n\n"+descript+"\n\n")
   plt.savefig(imagePath);
-  print("\n<center>\n![]("+imagePath+")\n</center>\n")
+  print("\n<center>\n![]("+imagePath+"){width=90%}\n</center>\n")
   print("\n\nView full image ["+imagePath+"]("+imagePath+")\n\n")
   
 def CompareSurfaces(img1,desc1,img2,desc2,TL=(0,0),BR=(100,100)):
