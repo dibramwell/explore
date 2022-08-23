@@ -1,0 +1,2317 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="generator" content="pandoc" />
+
+        <meta name="author" content="David Bramwell" />
+    
+        <meta name="date" content="2022-08-23" />
+    
+    <title>Raw Trace Analysis</title>
+    <!-- Material Design fonts -->
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+        <script src="RawTraceAnalysisOfMS2_files/header-attrs-2.14/header-attrs.js"></script>
+        <script src="RawTraceAnalysisOfMS2_files/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link href="RawTraceAnalysisOfMS2_files/bootstrap-3.3.7/css/bootstrap.min.css" rel="stylesheet" />
+        <script src="RawTraceAnalysisOfMS2_files/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+        <script src="RawTraceAnalysisOfMS2_files/navigation-1.1/tabsets.js"></script>
+        <link href="RawTraceAnalysisOfMS2_files/magnific-popup-1.1.0/magnific-popup.css" rel="stylesheet" />
+        <script src="RawTraceAnalysisOfMS2_files/magnific-popup-1.1.0/jquery.magnific-popup.min.js"></script>
+        <link href="RawTraceAnalysisOfMS2_files/bootstrap_material-0.1/bootstrap-material-design.min.css" rel="stylesheet" />
+        <link href="RawTraceAnalysisOfMS2_files/bootstrap_material-0.1/ripples.min.css" rel="stylesheet" />
+        <script src="RawTraceAnalysisOfMS2_files/bootstrap_material-0.1/material.min.js"></script>
+        <script src="RawTraceAnalysisOfMS2_files/bootstrap_material-0.1/ripples.min.js"></script>
+        <link href="RawTraceAnalysisOfMS2_files/material-0.1/material.css" rel="stylesheet" />
+        <script src="RawTraceAnalysisOfMS2_files/material-0.1/material.js"></script>
+    
+    
+    
+        <link rel="stylesheet" href="DIB.css" type="text/css" />
+    
+    <!-- tabsets -->
+    <script>
+      $(document).ready(function () {
+	  window.buildTabsets("toc");
+      });
+      $(document).ready(function () {
+	  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+	      $(this).parent().toggleClass('nav-tabs-open')
+	  });
+      });
+    </script>
+
+    <!-- code folding -->
+    
+    <!-- code download -->
+    
+
+    <!-- tabsets dropdown -->
+
+    <style type="text/css">
+      .tabset-dropdown > .nav-tabs {
+	  display: inline-table;
+	  max-height: 500px;
+	  min-height: 44px;
+	  overflow-y: auto;
+	  background: white;
+	  border: 1px solid #ddd;
+	  border-radius: 4px;
+      }
+      
+      .tabset-dropdown > .nav-tabs > li.active:before {
+	  content: "";
+	  font-family: 'Glyphicons Halflings';
+	  display: inline-block;
+	  padding: 10px;
+	  border-right: 1px solid #ddd;
+      }
+      
+      .tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+	  content: "&#xe258;";
+	  border: none;
+      }
+      
+      .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+	  content: "";
+	  font-family: 'Glyphicons Halflings';
+	  display: inline-block;
+	  padding: 10px;
+	  border-right: 1px solid #ddd;
+      }
+      
+      .pages .tabset-dropdown > .nav-tabs > li.active {
+	  display: block;
+      }
+
+      .pages .tabset-dropdown > .nav-tabs > li.active > a {
+	  background-color: transparent !important;
+	  color: #000000 !important;
+      }
+      
+      .tabset-dropdown > .nav-tabs > li > a,
+      .tabset-dropdown > .nav-tabs > li > a:focus,
+      .tabset-dropdown > .nav-tabs > li > a:hover {
+	  border: none;
+	  display: inline-block;
+	  border-radius: 4px;
+	  background-color: transparent;
+	  color: #00A698 !important;
+	  font-weight: 300 !important;
+	  font-size: 14px;
+      }
+      
+      .tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+	  display: block;
+	  float: none;
+      }
+      
+      .tabset-dropdown > .nav-tabs > li {
+	  display: none;
+      }
+    </style>
+    
+</head>
+
+<body>
+
+  <div class="header-panel shadow z-2">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-xs-3">
+	  	  <div id="header">
+	    <h1 class="title">Raw Trace Analysis</h1>
+	    	    	    	    <h4 class="author"><a
+href="mailto:david.bramwell@gmail.com">David Bramwell</a></h4>
+	    	    	    	    <h4 class="date">2022-08-23</h4>
+	    	  </div>
+	  	</div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="container-fluid main-container">
+    <div class="row">
+
+<nav class="col-xs-3 menu">
+<div id="toc">
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#start-with-the-peptides-outlined-in-the-paper">Start with
+the peptides outlined in the paper</a></li>
+<li><a
+href="#single-trace-tests-b-ion-and-y-ion-tuned-remapping-to-a-common-space">Single
+trace tests: b Ion and y Ion tuned remapping to a common space</a></li>
+<li><a href="#peptide-groupings">Peptide groupings</a></li>
+<li><a href="#pca">PCA</a></li>
+<li><a
+href="#hierarchical-clustering-of-pca-eigenvalues-and-first-eigenvectors">Hierarchical
+clustering of PCA eigenvalues and first eigenvectors</a></li>
+<li><a href="#robust-pca">Robust PCA</a></li>
+<li><a
+href="#hierarchical-clustering-of-robust-pca-and-eigenvectors">Hierarchical
+clustering of robust PCA and ‘eigenvectors’</a></li>
+<li><a href="#partial-least-squares-regression-plsr">Partial Least
+Squares Regression (PLSR)</a></li>
+<li><a href="#principal-component-regression-pcr">Principal Component
+Regression (PCR)</a></li>
+<li><a href="#canonical-powered-partial-least-squares-cppls.">Canonical
+Powered Partial Least Squares (CPPLS).</a></li>
+<li><a href="#discussion">Discussion</a></li>
+</ul>
+</div>
+</nav>
+      
+<div class="pages col-xs-9">
+
+
+    
+<div class="row">
+
+<div class="col-xs-10">
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>As previously mentioned the mapping of the raw trace data into a
+unified space is required before it can be effectively analysed and
+machine learning (ML) applied. In theory you can use ML to define a more
+effective mapping as a learning goal but, initially at least, you have
+to map everything into a common representation to achieve this. Doing
+this with MS2 traces is not trivial as the data is sparse and large,
+prohibitively large in a uniform representation.</p>
+<p>The mapping is crucial. Decisions made at this point impact all
+downstream analysis. Every technique used here may give a different
+result if we start with a different initial mapping. In this respect,
+any conclusion related to say PCA, is not exhaustive but may be specific
+to PCA <em>given the data involved and the mapping utilised</em>.</p>
+<p>In this analysis I look to create the first stage ‘convolutions’
+before exploring more transforms and ML models. The raw traces are not
+uniformly sampled so you first have to decide what uniform space to put
+them in. Rather than simply super-sampling to a common interpolated
+space I will look here to create b and y ion optimised mappings.</p>
+<p>Here we use the brute force amino combinations up to 9 peptides.
+There are 659,955 unique masses in the cache file across a range of min
+57.02146 to max 1674.71379 mZ. These are used to calculate the possible
+mZ masses of all unmodified peptides in terms of b and y ions and the
+raw traces are mapped to only represent these values (currently using a
+regional maximum). The mass ranges are further limited to ease
+computation burden to cover a range of around 1,000 mZ.</p>
+<p>The analyses are designed to increase in ‘assumptions’ going from
+unsupervised (i.e. not using peptide information; PCA, robust PCA) to
+supervised techniques (<a
+href="https://cran.r-project.org/web/packages/pls/index.html">Partial
+Least Squares Regression (PLSR), Principal Component Regression (PCR)
+and Canonical Powered Partial Least Squares (CPPLS)</a> which will
+optimise based on the specified groupings).</p>
+<p>The longer term goal is to derive a useful transformation of the data
+that we can then use on the MS2 traces in the data files that have not
+been assigned peptides within the paper so we first seek a task specific
+result and then will test it on a broader set (possibly not in this
+analysis scope).</p>
+</div>
+<div id="start-with-the-peptides-outlined-in-the-paper"
+class="section level1">
+<h1>Start with the peptides outlined in the paper</h1>
+<p>The mapping of the MS2 traces into the transformed space can be
+computationally expensive so this has been done once and the results
+cached to disk.</p>
+<div id="cacheing-required-ion-maps-for-speed." class="section level2">
+<h2>Cacheing required Ion maps for speed.</h2>
+<p>Scans are batched by raw data file and then processed on multiple
+cores.</p>
+<p>Cache folder contains 206 files</p>
+<ul>
+<li><p>Batch 1 HFX0070_COVID19_L243_C493_SPIKE_EVEN.raw :: 44
+peptides</p></li>
+<li><p>Batch 2 HFX0070_COVID19_L243_C493_SPIKE_EVEN.raw :: 44
+peptides</p></li>
+<li><p>Batch 1 HFX0070_COVID19_L243_C459_SPIKE_EVEN.raw :: 29
+peptides</p></li>
+<li><p>Batch 1 HFX0070_COVID19_L243_C460_SPIKE_ODD.raw :: 19
+peptides</p></li>
+<li><p>Batch 1 HFX0070_COVID19_L243_C459_SPIKE_ODD.raw :: 26
+peptides</p></li>
+<li><p>Batch 1 HFX0070_COVID19_L243_C493_SPIKE_ODD.raw :: 32
+peptides</p></li>
+<li><p>Batch 1 HFX0070_COVID19_L243_C460_SPIKE_EVEN.raw :: 16
+peptides</p></li>
+<li><p>Batch 1 HFX0070_COVID19_L243_C491_SPIKE_EVEN.raw :: 12
+peptides</p></li>
+<li><p>Batch 1 HFX0070_COVID19_L243_C2_SPIKE_EVEN.raw :: 7
+peptides</p></li>
+<li><p>Batch 1 HFX0070_COVID19_L243_C491_SPIKE_ODD.raw :: 8
+peptides</p></li>
+<li><p>Batch 1 HFX0070_COVID19_B721_C493_SPIKE_ODD.raw :: 3
+peptides</p></li>
+<li><p>Batch 1 HFX0070_COVID19_B721_C493_SPIKE_EVEN.raw :: 4
+peptides</p></li>
+<li><p>Batch 1 HFX0070_COVID19_B721_C459_SPIKE_ODD.raw :: 2
+peptides</p></li>
+<li><p>Batch 1 HFX0070_COVID19_B721_C459_SPIKE_EVEN.raw :: 3
+peptides</p></li>
+<li><p>Batch 1 HFX0070_COVID19_L243_C2_SPIKE_ODD.raw :: 1
+peptides</p></li>
+</ul>
+</div>
+</div>
+<div
+id="single-trace-tests-b-ion-and-y-ion-tuned-remapping-to-a-common-space"
+class="section level1">
+<h1>Single trace tests: b Ion and y Ion tuned remapping to a common
+space</h1>
+<div
+id="mz-axis-data-has-324126-entries-after-removing-columns-with-zero-sums.-intensities-are-log-scaled.-mz-range-limited-between-57.02146-and-1056.58687-mz."
+class="section level3">
+<h3>mZ axis data has 324,126 entries after removing columns with zero
+sums. Intensities are log scaled. mZ range limited between 57.02146 and
+1056.58687 mZ.</h3>
+<p>Note: the traces have been ordered to match the PCA hierarchical
+clustering.</p>
+<p>Red trace tuned for b Ions and blue for y Ions. Click on the images
+for a bigger version.</p>
+<p><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-1.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-2.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-3.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-4.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-5.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-6.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-7.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-8.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-9.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-10.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-11.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-12.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-13.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-14.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-15.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-16.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-17.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-18.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-19.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-20.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-21.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-22.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-23.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-24.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-25.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-26.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-27.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-28.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-29.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-30.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-31.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-32.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-33.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-34.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-35.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-36.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-37.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-38.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-39.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-40.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-41.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-42.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-43.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-44.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-45.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-46.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-47.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-48.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-49.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-50.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-51.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-52.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-53.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-54.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-55.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-56.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-57.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-58.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-59.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-60.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-61.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-62.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-63.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-64.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-65.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-66.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-67.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-68.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-69.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-70.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-71.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-72.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-73.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-74.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-75.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-76.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-77.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-78.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-79.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-80.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-81.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-82.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-83.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-84.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-85.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-86.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-87.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-88.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-89.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-90.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-91.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-92.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-93.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-94.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-95.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-96.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-97.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-98.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-99.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-100.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-101.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-102.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-103.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-104.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-105.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-106.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-107.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-108.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-109.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-110.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-111.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-112.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-113.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-114.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-115.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-116.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-117.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-118.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-119.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-120.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-121.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-122.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-123.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-124.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-125.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-126.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-127.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-128.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-129.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-130.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-131.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-132.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-133.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-134.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-135.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-136.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-137.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-138.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-139.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-140.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-141.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-142.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-143.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-144.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-145.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-146.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-147.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-148.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-149.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-150.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-151.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-152.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-153.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-154.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-155.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-156.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-157.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-158.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-159.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-160.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-161.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-162.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-163.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-164.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-165.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-166.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-167.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-168.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-169.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-170.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-171.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-172.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-173.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-174.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-175.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-176.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-177.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-178.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-179.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-180.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-181.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-182.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-183.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-184.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-185.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-186.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-187.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-188.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-189.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-190.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-191.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-192.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-193.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-194.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-195.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-196.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-197.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-198.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-199.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-200.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-201.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-202.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-203.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-204.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-205.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/splittrace-206.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>The remaining exploratory analyses only uses the b Ion mappings shown
+in red.</p>
+</div>
+</div>
+<div id="peptide-groupings" class="section level1">
+<h1>Peptide groupings</h1>
+<p>The peptides specified in the paper have been grouped. This was
+achieved by taking the shortest peptide and grouping all peptides that
+<a
+href="https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/agrep">approximately
+match it</a> together and repeating this until no peptides remain. The
+colours shown are used in the plots in the following sections. Ungrouped
+single peptides are coloured black in the plots.</p>
+<p>This results in the following groupings.</p>
+<table class="table table-striped" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;font-weight: bold;">
+</th>
+<th style="text-align:left;font-weight: bold;">
+PeptideGroup
+</th>
+<th style="text-align:left;font-weight: bold;">
+Colour
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+GVYYPDK
+</td>
+<td style="text-align:left;">
+GVYYPDK
+</td>
+<td style="text-align:left;color: white !important;background-color: #E41A1C !important;">
+#E41A1C
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+RGVYYPDK
+</td>
+<td style="text-align:left;">
+GVYYPDK
+</td>
+<td style="text-align:left;color: white !important;background-color: #E41A1C !important;">
+#E41A1C
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+TRGVYYPDK
+</td>
+<td style="text-align:left;">
+GVYYPDK
+</td>
+<td style="text-align:left;color: white !important;background-color: #E41A1C !important;">
+#E41A1C
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+FTRGVYYPDK
+</td>
+<td style="text-align:left;">
+GVYYPDK
+</td>
+<td style="text-align:left;color: white !important;background-color: #E41A1C !important;">
+#E41A1C
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+RGVYYPDKVFR
+</td>
+<td style="text-align:left;">
+GVYYPDK
+</td>
+<td style="text-align:left;color: white !important;background-color: #E41A1C !important;">
+#E41A1C
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GVYYPDKVFRS
+</td>
+<td style="text-align:left;">
+GVYYPDK
+</td>
+<td style="text-align:left;color: white !important;background-color: #E41A1C !important;">
+#E41A1C
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+RGVYYPDKVFRS
+</td>
+<td style="text-align:left;">
+GVYYPDK
+</td>
+<td style="text-align:left;color: white !important;background-color: #E41A1C !important;">
+#E41A1C
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GVYYPDKVFRSS
+</td>
+<td style="text-align:left;">
+GVYYPDK
+</td>
+<td style="text-align:left;color: white !important;background-color: #E41A1C !important;">
+#E41A1C
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+TRGVYYPDKVFRS
+</td>
+<td style="text-align:left;">
+GVYYPDK
+</td>
+<td style="text-align:left;color: white !important;background-color: #E41A1C !important;">
+#E41A1C
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+RGVYYPDKVFRSS
+</td>
+<td style="text-align:left;">
+GVYYPDK
+</td>
+<td style="text-align:left;color: white !important;background-color: #E41A1C !important;">
+#E41A1C
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GVYYPDKVFRSSV
+</td>
+<td style="text-align:left;">
+GVYYPDK
+</td>
+<td style="text-align:left;color: white !important;background-color: #E41A1C !important;">
+#E41A1C
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+TRGVYYPDKVFRSS
+</td>
+<td style="text-align:left;">
+GVYYPDK
+</td>
+<td style="text-align:left;color: white !important;background-color: #E41A1C !important;">
+#E41A1C
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+RGVYYPDKVFRSSV
+</td>
+<td style="text-align:left;">
+GVYYPDK
+</td>
+<td style="text-align:left;color: white !important;background-color: #E41A1C !important;">
+#E41A1C
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GVYYPDKVFRSSVL
+</td>
+<td style="text-align:left;">
+GVYYPDK
+</td>
+<td style="text-align:left;color: white !important;background-color: #E41A1C !important;">
+#E41A1C
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+TRGVYYPDKVFRSSV
+</td>
+<td style="text-align:left;">
+GVYYPDK
+</td>
+<td style="text-align:left;color: white !important;background-color: #E41A1C !important;">
+#E41A1C
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+RGVYYPDKVFRSSVL
+</td>
+<td style="text-align:left;">
+GVYYPDK
+</td>
+<td style="text-align:left;color: white !important;background-color: #E41A1C !important;">
+#E41A1C
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GVYYPDKVFRSSVLH
+</td>
+<td style="text-align:left;">
+GVYYPDK
+</td>
+<td style="text-align:left;color: white !important;background-color: #E41A1C !important;">
+#E41A1C
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+TRGVYYPDKVFRSSVL
+</td>
+<td style="text-align:left;">
+GVYYPDK
+</td>
+<td style="text-align:left;color: white !important;background-color: #E41A1C !important;">
+#E41A1C
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+RGVYYPDKVFRSSVLH
+</td>
+<td style="text-align:left;">
+GVYYPDK
+</td>
+<td style="text-align:left;color: white !important;background-color: #E41A1C !important;">
+#E41A1C
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+LPPAYTNSFTRGVYYPD
+</td>
+<td style="text-align:left;">
+GVYYPDK
+</td>
+<td style="text-align:left;color: white !important;background-color: #E41A1C !important;">
+#E41A1C
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+FTRGVYYPDKVFRSSVL
+</td>
+<td style="text-align:left;">
+GVYYPDK
+</td>
+<td style="text-align:left;color: white !important;background-color: #E41A1C !important;">
+#E41A1C
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+TRGVYYPDKVFRSSVLH
+</td>
+<td style="text-align:left;">
+GVYYPDK
+</td>
+<td style="text-align:left;color: white !important;background-color: #E41A1C !important;">
+#E41A1C
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+FTRGVYYPDKVFRSSVLH
+</td>
+<td style="text-align:left;">
+GVYYPDK
+</td>
+<td style="text-align:left;color: white !important;background-color: #E41A1C !important;">
+#E41A1C
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+SFTRGVYYPDKVFRSSVLH
+</td>
+<td style="text-align:left;">
+GVYYPDK
+</td>
+<td style="text-align:left;color: white !important;background-color: #E41A1C !important;">
+#E41A1C
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GKAHFPR
+</td>
+<td style="text-align:left;">
+GKAHFPR
+</td>
+<td style="text-align:left;color: white !important;background-color: #4DAF4A !important;">
+#4DAF4A
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GKAHFPRE
+</td>
+<td style="text-align:left;">
+GKAHFPR
+</td>
+<td style="text-align:left;color: white !important;background-color: #4DAF4A !important;">
+#4DAF4A
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GKAHFPREG
+</td>
+<td style="text-align:left;">
+GKAHFPR
+</td>
+<td style="text-align:left;color: white !important;background-color: #4DAF4A !important;">
+#4DAF4A
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+IC(+119.00)HDGKAHFPR
+</td>
+<td style="text-align:left;">
+GKAHFPR
+</td>
+<td style="text-align:left;color: white !important;background-color: #4DAF4A !important;">
+#4DAF4A
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+AIC(+119.00)HDGKAHFPR
+</td>
+<td style="text-align:left;">
+GKAHFPR
+</td>
+<td style="text-align:left;color: white !important;background-color: #4DAF4A !important;">
+#4DAF4A
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+APAIC(+47.98)HDGKAHFPR
+</td>
+<td style="text-align:left;">
+GKAHFPR
+</td>
+<td style="text-align:left;color: white !important;background-color: #4DAF4A !important;">
+#4DAF4A
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PAIC(+47.98)HDGKAHFPRE
+</td>
+<td style="text-align:left;">
+GKAHFPR
+</td>
+<td style="text-align:left;color: white !important;background-color: #4DAF4A !important;">
+#4DAF4A
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PAIC(+119.00)HDGKAHFPR
+</td>
+<td style="text-align:left;">
+GKAHFPR
+</td>
+<td style="text-align:left;color: white !important;background-color: #4DAF4A !important;">
+#4DAF4A
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+TAPAIC(+119.00)HDGKAHFPR
+</td>
+<td style="text-align:left;">
+GKAHFPR
+</td>
+<td style="text-align:left;color: white !important;background-color: #4DAF4A !important;">
+#4DAF4A
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+APAIC(+119.00)HDGKAHFPRE
+</td>
+<td style="text-align:left;">
+GKAHFPR
+</td>
+<td style="text-align:left;color: white !important;background-color: #4DAF4A !important;">
+#4DAF4A
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PAIC(+119.00)HDGKAHFPREG
+</td>
+<td style="text-align:left;">
+GKAHFPR
+</td>
+<td style="text-align:left;color: white !important;background-color: #4DAF4A !important;">
+#4DAF4A
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+TAPAIC(+119.00)HDGKAHFPRE
+</td>
+<td style="text-align:left;">
+GKAHFPR
+</td>
+<td style="text-align:left;color: white !important;background-color: #4DAF4A !important;">
+#4DAF4A
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+APAIC(+119.00)HDGKAHFPREG
+</td>
+<td style="text-align:left;">
+GKAHFPR
+</td>
+<td style="text-align:left;color: white !important;background-color: #4DAF4A !important;">
+#4DAF4A
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+TAPAIC(+119.00)HDGKAHFPREG
+</td>
+<td style="text-align:left;">
+GKAHFPR
+</td>
+<td style="text-align:left;color: white !important;background-color: #4DAF4A !important;">
+#4DAF4A
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+TAPAIC(+119.00)HDGKAHFPREGV
+</td>
+<td style="text-align:left;">
+GKAHFPR
+</td>
+<td style="text-align:left;color: white !important;background-color: #4DAF4A !important;">
+#4DAF4A
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PFLGVYYH
+</td>
+<td style="text-align:left;">
+PFLGVYYH
+</td>
+<td style="text-align:left;color: white !important;background-color: #B3DE69 !important;">
+#B3DE69
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PFLGVYYHK
+</td>
+<td style="text-align:left;">
+PFLGVYYH
+</td>
+<td style="text-align:left;color: white !important;background-color: #B3DE69 !important;">
+#B3DE69
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+EFQFC(+119.00)NDPFLGVYYH
+</td>
+<td style="text-align:left;">
+PFLGVYYH
+</td>
+<td style="text-align:left;color: white !important;background-color: #B3DE69 !important;">
+#B3DE69
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PSKPSKRSF
+</td>
+<td style="text-align:left;">
+PSKPSKRSF
+</td>
+<td style="text-align:left;color: white !important;background-color: #FCCDE5 !important;">
+#FCCDE5
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PSKPSKRSFI
+</td>
+<td style="text-align:left;">
+PSKPSKRSF
+</td>
+<td style="text-align:left;color: white !important;background-color: #FCCDE5 !important;">
+#FCCDE5
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+FSQILPDPSKPSKRS
+</td>
+<td style="text-align:left;">
+PSKPSKRSF
+</td>
+<td style="text-align:left;color: white !important;background-color: #FCCDE5 !important;">
+#FCCDE5
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+SFIEDLLFNK
+</td>
+<td style="text-align:left;">
+SFIEDLLFNK
+</td>
+<td style="text-align:left;color: white !important;background-color: #000000 !important;">
+#000000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+FRVQPTESIVR
+</td>
+<td style="text-align:left;">
+FRVQPTESIVR
+</td>
+<td style="text-align:left;color: white !important;background-color: #FFFFB3 !important;">
+#FFFFB3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+TSNFRVQPTESIVR
+</td>
+<td style="text-align:left;">
+FRVQPTESIVR
+</td>
+<td style="text-align:left;color: white !important;background-color: #FFFFB3 !important;">
+#FFFFB3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+TSNFRVQ(+.98)PTESIVR
+</td>
+<td style="text-align:left;">
+FRVQPTESIVR
+</td>
+<td style="text-align:left;color: white !important;background-color: #FFFFB3 !important;">
+#FFFFB3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Q(-17.03)TSNFRVQPTESIVR
+</td>
+<td style="text-align:left;">
+FRVQPTESIVR
+</td>
+<td style="text-align:left;color: white !important;background-color: #FFFFB3 !important;">
+#FFFFB3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ILPDPSKPSKR
+</td>
+<td style="text-align:left;">
+ILPDPSKPSKR
+</td>
+<td style="text-align:left;color: white !important;background-color: #FF7F00 !important;">
+#FF7F00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+SQILPDPSKPSK
+</td>
+<td style="text-align:left;">
+ILPDPSKPSKR
+</td>
+<td style="text-align:left;color: white !important;background-color: #FF7F00 !important;">
+#FF7F00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+FSQILPDPSKPSK
+</td>
+<td style="text-align:left;">
+ILPDPSKPSKR
+</td>
+<td style="text-align:left;color: white !important;background-color: #FF7F00 !important;">
+#FF7F00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+SQILPDPSKPSKR
+</td>
+<td style="text-align:left;">
+ILPDPSKPSKR
+</td>
+<td style="text-align:left;color: white !important;background-color: #FF7F00 !important;">
+#FF7F00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+FSQILPDPSKPSKR
+</td>
+<td style="text-align:left;">
+ILPDPSKPSKR
+</td>
+<td style="text-align:left;color: white !important;background-color: #FF7F00 !important;">
+#FF7F00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Q(-17.03)ILPDPSKPSKR
+</td>
+<td style="text-align:left;">
+ILPDPSKPSKR
+</td>
+<td style="text-align:left;color: white !important;background-color: #FF7F00 !important;">
+#FF7F00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+N(+203.08)FSQILPDPSKPSKR
+</td>
+<td style="text-align:left;">
+ILPDPSKPSKR
+</td>
+<td style="text-align:left;color: white !important;background-color: #FF7F00 !important;">
+#FF7F00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GFN(+203.08)FSQILPDPSKPSKR
+</td>
+<td style="text-align:left;">
+ILPDPSKPSKR
+</td>
+<td style="text-align:left;color: white !important;background-color: #FF7F00 !important;">
+#FF7F00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+KIYSKHTPINL
+</td>
+<td style="text-align:left;">
+KIYSKHTPINL
+</td>
+<td style="text-align:left;color: white !important;background-color: #984EA3 !important;">
+#984EA3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+FKIYSKHTPINL
+</td>
+<td style="text-align:left;">
+KIYSKHTPINL
+</td>
+<td style="text-align:left;color: white !important;background-color: #984EA3 !important;">
+#984EA3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+YFKIYSKHTPINL
+</td>
+<td style="text-align:left;">
+KIYSKHTPINL
+</td>
+<td style="text-align:left;color: white !important;background-color: #984EA3 !important;">
+#984EA3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GYFKIYSKHTPINL
+</td>
+<td style="text-align:left;">
+KIYSKHTPINL
+</td>
+<td style="text-align:left;color: white !important;background-color: #984EA3 !important;">
+#984EA3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DGYFKIYSKHTPINL
+</td>
+<td style="text-align:left;">
+KIYSKHTPINL
+</td>
+<td style="text-align:left;color: white !important;background-color: #984EA3 !important;">
+#984EA3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+YFKIYSKHTPINLVR
+</td>
+<td style="text-align:left;">
+KIYSKHTPINL
+</td>
+<td style="text-align:left;color: white !important;background-color: #984EA3 !important;">
+#984EA3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+IDGYFKIYSKHTPINL
+</td>
+<td style="text-align:left;">
+KIYSKHTPINL
+</td>
+<td style="text-align:left;color: white !important;background-color: #984EA3 !important;">
+#984EA3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+YFKIYSKHTPINLVRD
+</td>
+<td style="text-align:left;">
+KIYSKHTPINL
+</td>
+<td style="text-align:left;color: white !important;background-color: #984EA3 !important;">
+#984EA3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+NIDGYFKIYSKHTPINL
+</td>
+<td style="text-align:left;">
+KIYSKHTPINL
+</td>
+<td style="text-align:left;color: white !important;background-color: #984EA3 !important;">
+#984EA3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+YQTQTNSPGSA
+</td>
+<td style="text-align:left;">
+YQTQTNSPGSA
+</td>
+<td style="text-align:left;color: white !important;background-color: #E7298A !important;">
+#E7298A
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ASYQTQTNSPGSA
+</td>
+<td style="text-align:left;">
+YQTQTNSPGSA
+</td>
+<td style="text-align:left;color: white !important;background-color: #E7298A !important;">
+#E7298A
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+LKSFTVEKGIYQ
+</td>
+<td style="text-align:left;">
+LKSFTVEKGIYQ
+</td>
+<td style="text-align:left;color: white !important;background-color: #FDB462 !important;">
+#FDB462
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+TLKSFTVEKGIYQTSN
+</td>
+<td style="text-align:left;">
+LKSFTVEKGIYQ
+</td>
+<td style="text-align:left;color: white !important;background-color: #FDB462 !important;">
+#FDB462
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+TK(+145.02)CTLKSFTVEKGIYQTSNFRVQPT
+</td>
+<td style="text-align:left;">
+LKSFTVEKGIYQ
+</td>
+<td style="text-align:left;color: white !important;background-color: #FDB462 !important;">
+#FDB462
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ASVVNIQKEIDR
+</td>
+<td style="text-align:left;">
+ASVVNIQKEIDR
+</td>
+<td style="text-align:left;color: white !important;background-color: #000000 !important;">
+#000000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+KPFERDISTEIYQ
+</td>
+<td style="text-align:left;">
+KPFERDISTEIYQ
+</td>
+<td style="text-align:left;color: white !important;background-color: #377EB8 !important;">
+#377EB8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+LKPFERDISTEIYQ
+</td>
+<td style="text-align:left;">
+KPFERDISTEIYQ
+</td>
+<td style="text-align:left;color: white !important;background-color: #377EB8 !important;">
+#377EB8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+NLKPFERDISTEIYQ
+</td>
+<td style="text-align:left;">
+KPFERDISTEIYQ
+</td>
+<td style="text-align:left;color: white !important;background-color: #377EB8 !important;">
+#377EB8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+LKPFERDISTEIYQA
+</td>
+<td style="text-align:left;">
+KPFERDISTEIYQ
+</td>
+<td style="text-align:left;color: white !important;background-color: #377EB8 !important;">
+#377EB8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+SNLKPFERDISTEIYQ
+</td>
+<td style="text-align:left;">
+KPFERDISTEIYQ
+</td>
+<td style="text-align:left;color: white !important;background-color: #377EB8 !important;">
+#377EB8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+NLKPFERDISTEIYQA
+</td>
+<td style="text-align:left;">
+KPFERDISTEIYQ
+</td>
+<td style="text-align:left;color: white !important;background-color: #377EB8 !important;">
+#377EB8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+LKPFERDISTEIYQAG
+</td>
+<td style="text-align:left;">
+KPFERDISTEIYQ
+</td>
+<td style="text-align:left;color: white !important;background-color: #377EB8 !important;">
+#377EB8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+KSNLKPFERDISTEIYQ
+</td>
+<td style="text-align:left;">
+KPFERDISTEIYQ
+</td>
+<td style="text-align:left;color: white !important;background-color: #377EB8 !important;">
+#377EB8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+SNLKPFERDISTEIYQA
+</td>
+<td style="text-align:left;">
+KPFERDISTEIYQ
+</td>
+<td style="text-align:left;color: white !important;background-color: #377EB8 !important;">
+#377EB8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+RKSNLKPFERDISTEIYQ
+</td>
+<td style="text-align:left;">
+KPFERDISTEIYQ
+</td>
+<td style="text-align:left;color: white !important;background-color: #377EB8 !important;">
+#377EB8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+KSNLKPFERDISTEIYQA
+</td>
+<td style="text-align:left;">
+KPFERDISTEIYQ
+</td>
+<td style="text-align:left;color: white !important;background-color: #377EB8 !important;">
+#377EB8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+SNLKPFERDISTEIYQAG
+</td>
+<td style="text-align:left;">
+KPFERDISTEIYQ
+</td>
+<td style="text-align:left;color: white !important;background-color: #377EB8 !important;">
+#377EB8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+RKSNLKPFERDISTEIYQA
+</td>
+<td style="text-align:left;">
+KPFERDISTEIYQ
+</td>
+<td style="text-align:left;color: white !important;background-color: #377EB8 !important;">
+#377EB8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+KSNLKPFERDISTEIYQAG
+</td>
+<td style="text-align:left;">
+KPFERDISTEIYQ
+</td>
+<td style="text-align:left;color: white !important;background-color: #377EB8 !important;">
+#377EB8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+RKSNLKPFERDISTEIYQAG
+</td>
+<td style="text-align:left;">
+KPFERDISTEIYQ
+</td>
+<td style="text-align:left;color: white !important;background-color: #377EB8 !important;">
+#377EB8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+KSNLKPFERDISTEIYQAGSTP
+</td>
+<td style="text-align:left;">
+KPFERDISTEIYQ
+</td>
+<td style="text-align:left;color: white !important;background-color: #377EB8 !important;">
+#377EB8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+KSNLKPFERDISTEIYQAGSTPC(+305.07)
+</td>
+<td style="text-align:left;">
+KPFERDISTEIYQ
+</td>
+<td style="text-align:left;color: white !important;background-color: #377EB8 !important;">
+#377EB8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+VEKGIYQTSNFRV
+</td>
+<td style="text-align:left;">
+VEKGIYQTSNFRV
+</td>
+<td style="text-align:left;color: white !important;background-color: #999999 !important;">
+#999999
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+KGIYQTSNFRVQPT
+</td>
+<td style="text-align:left;">
+VEKGIYQTSNFRV
+</td>
+<td style="text-align:left;color: white !important;background-color: #999999 !important;">
+#999999
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+VEKGIYQTSNFRVQP
+</td>
+<td style="text-align:left;">
+VEKGIYQTSNFRV
+</td>
+<td style="text-align:left;color: white !important;background-color: #999999 !important;">
+#999999
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+KGIYQTSNFRVQPTE
+</td>
+<td style="text-align:left;">
+VEKGIYQTSNFRV
+</td>
+<td style="text-align:left;color: white !important;background-color: #999999 !important;">
+#999999
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+VEKGIYQTSNFRVQPT
+</td>
+<td style="text-align:left;">
+VEKGIYQTSNFRV
+</td>
+<td style="text-align:left;color: white !important;background-color: #999999 !important;">
+#999999
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+TVEKGIYQTSNFRVQPT
+</td>
+<td style="text-align:left;">
+VEKGIYQTSNFRV
+</td>
+<td style="text-align:left;color: white !important;background-color: #999999 !important;">
+#999999
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GIYQTSNFRVQPT
+</td>
+<td style="text-align:left;">
+GIYQTSNFRVQPT
+</td>
+<td style="text-align:left;color: white !important;background-color: #000000 !important;">
+#000000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DSLSSTASALGKL
+</td>
+<td style="text-align:left;">
+DSLSSTASALGKL
+</td>
+<td style="text-align:left;color: white !important;background-color: #FFFF33 !important;">
+#FFFF33
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+SLSSTASALGKLQ
+</td>
+<td style="text-align:left;">
+DSLSSTASALGKL
+</td>
+<td style="text-align:left;color: white !important;background-color: #FFFF33 !important;">
+#FFFF33
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DSLSSTASALGKLQ
+</td>
+<td style="text-align:left;">
+DSLSSTASALGKL
+</td>
+<td style="text-align:left;color: white !important;background-color: #FFFF33 !important;">
+#FFFF33
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+IQDSLSSTASALGKL
+</td>
+<td style="text-align:left;">
+DSLSSTASALGKL
+</td>
+<td style="text-align:left;color: white !important;background-color: #FFFF33 !important;">
+#FFFF33
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+IQDSLSSTASALGKLQ
+</td>
+<td style="text-align:left;">
+DSLSSTASALGKL
+</td>
+<td style="text-align:left;color: white !important;background-color: #FFFF33 !important;">
+#FFFF33
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DSLSSTASALGKLQDV
+</td>
+<td style="text-align:left;">
+DSLSSTASALGKL
+</td>
+<td style="text-align:left;color: white !important;background-color: #FFFF33 !important;">
+#FFFF33
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+IQDSLSSTASALGKLQD
+</td>
+<td style="text-align:left;">
+DSLSSTASALGKL
+</td>
+<td style="text-align:left;color: white !important;background-color: #FFFF33 !important;">
+#FFFF33
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+VIRGDEVRQIAPG
+</td>
+<td style="text-align:left;">
+VIRGDEVRQIAPG
+</td>
+<td style="text-align:left;color: white !important;background-color: #7570B3 !important;">
+#7570B3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DSFVIRGDEVRQIAPG
+</td>
+<td style="text-align:left;">
+VIRGDEVRQIAPG
+</td>
+<td style="text-align:left;color: white !important;background-color: #7570B3 !important;">
+#7570B3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GNYNYLYRLFRKS
+</td>
+<td style="text-align:left;">
+GNYNYLYRLFRKS
+</td>
+<td style="text-align:left;color: white !important;background-color: #FFED6F !important;">
+#FFED6F
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+VGGNYNYLYRLFRKS
+</td>
+<td style="text-align:left;">
+GNYNYLYRLFRKS
+</td>
+<td style="text-align:left;color: white !important;background-color: #FFED6F !important;">
+#FFED6F
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ASVYAWNRKRISN
+</td>
+<td style="text-align:left;">
+ASVYAWNRKRISN
+</td>
+<td style="text-align:left;color: white !important;background-color: #000000 !important;">
+#000000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+NTLVKQLSSNFGAI
+</td>
+<td style="text-align:left;">
+NTLVKQLSSNFGAI
+</td>
+<td style="text-align:left;color: white !important;background-color: #F781BF !important;">
+#F781BF
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+NTLVKQLSSNFGAIS
+</td>
+<td style="text-align:left;">
+NTLVKQLSSNFGAI
+</td>
+<td style="text-align:left;color: white !important;background-color: #F781BF !important;">
+#F781BF
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+LNTLVKQLSSNFGAIS
+</td>
+<td style="text-align:left;">
+NTLVKQLSSNFGAI
+</td>
+<td style="text-align:left;color: white !important;background-color: #F781BF !important;">
+#F781BF
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+NAQALNTLVKQLSSNFG
+</td>
+<td style="text-align:left;">
+NTLVKQLSSNFGAI
+</td>
+<td style="text-align:left;color: white !important;background-color: #F781BF !important;">
+#F781BF
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ALNTLVKQLSSNFGAIS
+</td>
+<td style="text-align:left;">
+NTLVKQLSSNFGAI
+</td>
+<td style="text-align:left;color: white !important;background-color: #F781BF !important;">
+#F781BF
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ALNTLVKQLSSNFGAISS
+</td>
+<td style="text-align:left;">
+NTLVKQLSSNFGAI
+</td>
+<td style="text-align:left;color: white !important;background-color: #F781BF !important;">
+#F781BF
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+LNRALTGIAVEQDK
+</td>
+<td style="text-align:left;">
+LNRALTGIAVEQDK
+</td>
+<td style="text-align:left;color: white !important;background-color: #A65628 !important;">
+#A65628
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+TQLNRALTGIAVEQDKN
+</td>
+<td style="text-align:left;">
+LNRALTGIAVEQDK
+</td>
+<td style="text-align:left;color: white !important;background-color: #A65628 !important;">
+#A65628
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+TQLNRALTGIAVEQDKNT
+</td>
+<td style="text-align:left;">
+LNRALTGIAVEQDK
+</td>
+<td style="text-align:left;color: white !important;background-color: #A65628 !important;">
+#A65628
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Q(-17.03)LNRALTGIAVEQDK
+</td>
+<td style="text-align:left;">
+LNRALTGIAVEQDK
+</td>
+<td style="text-align:left;color: white !important;background-color: #A65628 !important;">
+#A65628
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Q(-17.03)LNRALTGIAVEQDKN
+</td>
+<td style="text-align:left;">
+LNRALTGIAVEQDK
+</td>
+<td style="text-align:left;color: white !important;background-color: #A65628 !important;">
+#A65628
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Q(-17.03)LNRALTGIAVEQDKNT
+</td>
+<td style="text-align:left;">
+LNRALTGIAVEQDK
+</td>
+<td style="text-align:left;color: white !important;background-color: #A65628 !important;">
+#A65628
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+EYVSQPFLMDLEGK
+</td>
+<td style="text-align:left;">
+EYVSQPFLMDLEGK
+</td>
+<td style="text-align:left;color: white !important;background-color: #000000 !important;">
+#000000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+TPINLVRDLPQGFS
+</td>
+<td style="text-align:left;">
+TPINLVRDLPQGFS
+</td>
+<td style="text-align:left;color: white !important;background-color: #FB8072 !important;">
+#FB8072
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+TPINLVRDLPQGFSA
+</td>
+<td style="text-align:left;">
+TPINLVRDLPQGFS
+</td>
+<td style="text-align:left;color: white !important;background-color: #FB8072 !important;">
+#FB8072
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+TPINLVRDLPQGFSALEPL
+</td>
+<td style="text-align:left;">
+TPINLVRDLPQGFS
+</td>
+<td style="text-align:left;color: white !important;background-color: #FB8072 !important;">
+#FB8072
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+HTPINLVRDLPQGFSALEPL
+</td>
+<td style="text-align:left;">
+TPINLVRDLPQGFS
+</td>
+<td style="text-align:left;color: white !important;background-color: #FB8072 !important;">
+#FB8072
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+EPQIITTDNTFVSG
+</td>
+<td style="text-align:left;">
+EPQIITTDNTFVSG
+</td>
+<td style="text-align:left;color: white !important;background-color: #BC80BD !important;">
+#BC80BD
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+EPQIITTDNTFVSGNC(+119.00)
+</td>
+<td style="text-align:left;">
+EPQIITTDNTFVSG
+</td>
+<td style="text-align:left;color: white !important;background-color: #BC80BD !important;">
+#BC80BD
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+AAEIRASANLAATK
+</td>
+<td style="text-align:left;">
+AAEIRASANLAATK
+</td>
+<td style="text-align:left;color: white !important;background-color: #000000 !important;">
+#000000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+SSVLHSTQDLFLPF
+</td>
+<td style="text-align:left;">
+SSVLHSTQDLFLPF
+</td>
+<td style="text-align:left;color: white !important;background-color: #000000 !important;">
+#000000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+LQDVVNQNAQALNTL
+</td>
+<td style="text-align:left;">
+LQDVVNQNAQALNTL
+</td>
+<td style="text-align:left;color: white !important;background-color: #BEBADA !important;">
+#BEBADA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+KLQDVVNQNAQALNTLV
+</td>
+<td style="text-align:left;">
+LQDVVNQNAQALNTL
+</td>
+<td style="text-align:left;color: white !important;background-color: #BEBADA !important;">
+#BEBADA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GKLQDVVNQNAQALNTLVK
+</td>
+<td style="text-align:left;">
+LQDVVNQNAQALNTL
+</td>
+<td style="text-align:left;color: white !important;background-color: #BEBADA !important;">
+#BEBADA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DVVNQNAQALNTLVKQLSSN
+</td>
+<td style="text-align:left;">
+LQDVVNQNAQALNTL
+</td>
+<td style="text-align:left;color: white !important;background-color: #BEBADA !important;">
+#BEBADA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+NAQALNTLVKQLSSN
+</td>
+<td style="text-align:left;">
+NAQALNTLVKQLSSN
+</td>
+<td style="text-align:left;color: white !important;background-color: #000000 !important;">
+#000000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DILSR(+28.03)LD
+</td>
+<td style="text-align:left;">
+DILSR(+28.03)LD
+</td>
+<td style="text-align:left;color: white !important;background-color: #D9D9D9 !important;">
+#D9D9D9
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DILSRLDPPEAE(+21.98)VQ
+</td>
+<td style="text-align:left;">
+DILSR(+28.03)LD
+</td>
+<td style="text-align:left;color: white !important;background-color: #D9D9D9 !important;">
+#D9D9D9
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DYSVLYNSASFSTFK
+</td>
+<td style="text-align:left;">
+DYSVLYNSASFSTFK
+</td>
+<td style="text-align:left;color: white !important;background-color: #000000 !important;">
+#000000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+TPTWRVYSTGSNVFQ
+</td>
+<td style="text-align:left;">
+TPTWRVYSTGSNVFQ
+</td>
+<td style="text-align:left;color: white !important;background-color: #000000 !important;">
+#000000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GKQGNFKNLREFVFK
+</td>
+<td style="text-align:left;">
+GKQGNFKNLREFVFK
+</td>
+<td style="text-align:left;color: white !important;background-color: #000000 !important;">
+#000000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GTHWFVTQRNFYEPQ
+</td>
+<td style="text-align:left;">
+GTHWFVTQRNFYEPQ
+</td>
+<td style="text-align:left;color: white !important;background-color: #000000 !important;">
+#000000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+APAIC(+119.00)HD
+</td>
+<td style="text-align:left;">
+APAIC(+119.00)HD
+</td>
+<td style="text-align:left;color: white !important;background-color: #80B1D3 !important;">
+#80B1D3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+TAPAIC(+119.00)HD
+</td>
+<td style="text-align:left;">
+APAIC(+119.00)HD
+</td>
+<td style="text-align:left;color: white !important;background-color: #80B1D3 !important;">
+#80B1D3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+TAPAIC(+31.99)HDGKAH
+</td>
+<td style="text-align:left;">
+APAIC(+119.00)HD
+</td>
+<td style="text-align:left;color: white !important;background-color: #80B1D3 !important;">
+#80B1D3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ENQKLIANQFNSAIGK
+</td>
+<td style="text-align:left;">
+ENQKLIANQFNSAIGK
+</td>
+<td style="text-align:left;color: white !important;background-color: #000000 !important;">
+#000000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ATVCGPKKSTNLVKNK
+</td>
+<td style="text-align:left;">
+ATVCGPKKSTNLVKNK
+</td>
+<td style="text-align:left;color: white !important;background-color: #000000 !important;">
+#000000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+TQNVLYENQKLIANQFN
+</td>
+<td style="text-align:left;">
+TQNVLYENQKLIANQFN
+</td>
+<td style="text-align:left;color: white !important;background-color: #000000 !important;">
+#000000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DPPEAEVQIDRLITGRLQ
+</td>
+<td style="text-align:left;">
+DPPEAEVQIDRLITGRLQ
+</td>
+<td style="text-align:left;color: white !important;background-color: #000000 !important;">
+#000000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+WM(+31.99)ESEFRVYSSAN
+</td>
+<td style="text-align:left;">
+WM(+31.99)ESEFRVYSSAN
+</td>
+<td style="text-align:left;color: white !important;background-color: #000000 !important;">
+#000000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+IITTDNTFVSGNC(+305.07)
+</td>
+<td style="text-align:left;">
+IITTDNTFVSGNC(+305.07)
+</td>
+<td style="text-align:left;color: white !important;background-color: #1B9E77 !important;">
+#1B9E77
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+IITTDNTFVSGNC(+119.00)
+</td>
+<td style="text-align:left;">
+IITTDNTFVSGNC(+305.07)
+</td>
+<td style="text-align:left;color: white !important;background-color: #1B9E77 !important;">
+#1B9E77
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DISTEIYQAGSTPC(+119.00)
+</td>
+<td style="text-align:left;">
+DISTEIYQAGSTPC(+119.00)
+</td>
+<td style="text-align:left;color: white !important;background-color: #8DD3C7 !important;">
+#8DD3C7
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ISTEIYQAGSTPC(+119.00)NG
+</td>
+<td style="text-align:left;">
+DISTEIYQAGSTPC(+119.00)
+</td>
+<td style="text-align:left;color: white !important;background-color: #8DD3C7 !important;">
+#8DD3C7
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DISTEIYQAGSTPC(+119.00)NG
+</td>
+<td style="text-align:left;">
+DISTEIYQAGSTPC(+119.00)
+</td>
+<td style="text-align:left;color: white !important;background-color: #8DD3C7 !important;">
+#8DD3C7
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+RDISTEIYQAGSTPC(+119.00)NGVEG
+</td>
+<td style="text-align:left;">
+DISTEIYQAGSTPC(+119.00)
+</td>
+<td style="text-align:left;color: white !important;background-color: #8DD3C7 !important;">
+#8DD3C7
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GC(+119.00)VIAWNSNNLDSK
+</td>
+<td style="text-align:left;">
+GC(+119.00)VIAWNSNNLDSK
+</td>
+<td style="text-align:left;color: white !important;background-color: #CCEBC5 !important;">
+#CCEBC5
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+LPDDFTGC(+119.00)VIAWNSNNLDSK
+</td>
+<td style="text-align:left;">
+GC(+119.00)VIAWNSNNLDSK
+</td>
+<td style="text-align:left;color: white !important;background-color: #CCEBC5 !important;">
+#CCEBC5
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+TDEM(+15.99)IAQYTSALLAGT
+</td>
+<td style="text-align:left;">
+TDEM(+15.99)IAQYTSALLAGT
+</td>
+<td style="text-align:left;color: white !important;background-color: #D95F02 !important;">
+#D95F02
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DEM(+15.99)IAQYTSALLAGTIT
+</td>
+<td style="text-align:left;">
+TDEM(+15.99)IAQYTSALLAGT
+</td>
+<td style="text-align:left;color: white !important;background-color: #D95F02 !important;">
+#D95F02
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+NSASFSTFKC(+47.98)YGVSPT
+</td>
+<td style="text-align:left;">
+NSASFSTFKC(+47.98)YGVSPT
+</td>
+<td style="text-align:left;color: white !important;background-color: #000000 !important;">
+#000000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Q(-17.03)DKNTQEVFAQVKQIYK
+</td>
+<td style="text-align:left;">
+Q(-17.03)DKNTQEVFAQVKQIYK
+</td>
+<td style="text-align:left;color: white !important;background-color: #000000 !important;">
+#000000
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="pca" class="section level1">
+<h1>PCA</h1>
+<p>Simplistically, PCA remaps the the input traces to an alternative
+space where eigenvalues and eigenvectors have been created to take
+account of correlations and the algorithm seeks to assign the most
+variance to vectors in turn. Any original trace can be completely
+reconstructed by creating the sum of the eigenvectors multiplied by the
+eigenvalues for that trace. In PCA the eigenvectors are the same size as
+the original data, i.e. in this analysis 206 (peptides) <span
+class="math inline">\(*\)</span> 324,126 mZ values. The data actually
+gets larger because there also is a matrix of 206 * 206 eigenvalues.</p>
+<p>Generally, we will just deal with the reduced dimensional eigenvalues
+and the hope is that for many systems with correlated variables a
+reduced number of these dimensions represents important facets of the
+data.</p>
+<p>We can construct a <a
+href="https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/heatmap">heatmap</a>
+of eigenvalues. This provides a pictorial representation of the
+eigenvalues. The heatmap below also has the hierarchical clustering
+based on the distance matrix for the peptides. In an ideal world all of
+the peptide groups would cluster together. In my experience, this almost
+never happens with real world data and PCA. The coloured ribbon on the
+left hand side shows the group colours for the peptide. There are some
+blocks of colours so to some degree the PCA and hclust do group certain
+entries together.</p>
+<p>Of note in the heatmap itself is that there are very few obvious
+blocks of colour and if you squint at the plot youcan see a pattern
+across the diagonal which suggests that many of the eigenvectors are
+maximally involved in single peptide traces. This could be to represent
+noise features or that the MS2 traces are highly distinct.</p>
+<p>You can click on the plot to make it bigger (and then right click to
+open it in another browser tab that will allow you to zoom which makes
+the text easier to read).</p>
+<p>Since the map was optimised for b ions then I would expect clustering
+to work best for entries starting with the same few amino acids with
+lesser impact from y ions. This effect working best for the first few
+masses as beyond that many of the masses are in both b and y ions. I do
+find it interesting that some of the peptides that start with a
+different amino acid followed by the same sequence also cluster together
+in some cases.</p>
+<p>We also need to bear in mind that we a viewing a biased set,
+i.e. peptides found using peaks, we may simply be pulling out things
+based on algorithm details.</p>
+<p><img src="RawTraceAnalysisOfMS2_files/figure-html/PCAdend-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>The cumulative variance explained also shows that there is little
+reduction in the dimension of the data with over 170 eigenvectors
+required to explain over 99% of the variance. Again this may represent
+complex differences but also be a factor of noise content.</p>
+<p><img src="RawTraceAnalysisOfMS2_files/figure-html/cumVar-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>We can now look at the eigenvalues in terms of the petide groupings.
+It is common to rescale data before performing PCA (nomalising to the
+same scale etc.). I prefer not to do this as I like to see mean offsets
+between traces (though I have perfored a log compression on the data to
+better match scales). Given this PC1 (i.e. eigenvector 1) in these plots
+will tend to represent a mean offset value (the actual eigenvectors are
+shown in the next section). PC1 seems to show little grouping. PC2 is
+likely to be the first ‘signal’ vector and it seems to relatively neatly
+split out GVYYPDK group peptides.</p>
+<p>Several more eigenvector pairs are presented for visual review.</p>
+<p><img src="RawTraceAnalysisOfMS2_files/figure-html/pcaEigen-1.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/pcaEigen-2.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/pcaEigen-3.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/pcaEigen-4.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/pcaEigen-5.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/pcaEigen-6.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/pcaEigen-7.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/pcaEigen-8.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/pcaEigen-9.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/pcaEigen-10.png" width="100%" style="display: block; margin: auto;" /></p>
+</div>
+<div
+id="hierarchical-clustering-of-pca-eigenvalues-and-first-eigenvectors"
+class="section level1">
+<h1>Hierarchical clustering of PCA eigenvalues and first
+eigenvectors</h1>
+<p>The plot below shows the hierarchical clustering plot included in the
+heatmap followed by some of the first few eigenvector in mZ space. The
+plots show the sorts of features that the eigenvalue plots above might
+be emphasising to cluster the groups.</p>
+<p>As mentioned in the previous section the first one will be highly
+weighted towards ‘mean correction’. The second does appear to focus on
+emphasising and reducing certain masses but raw PCA eigenvectors tend to
+be hard to interpret as they seek variance and not a more specific class
+goal. It may take the combination of multiple vectors to clearly show
+focal areas.</p>
+<p><img src="RawTraceAnalysisOfMS2_files/figure-html/PCAdendWide-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>Showing first 10 eigenvectors.</p>
+<p><img src="RawTraceAnalysisOfMS2_files/figure-html/PCAdendWide-2.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/PCAdendWide-3.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/PCAdendWide-4.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/PCAdendWide-5.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/PCAdendWide-6.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/PCAdendWide-7.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/PCAdendWide-8.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/PCAdendWide-9.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/PCAdendWide-10.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/PCAdendWide-11.png" width="100%" style="display: block; margin: auto;" /></p>
+</div>
+<div id="robust-pca" class="section level1">
+<h1>Robust PCA</h1>
+<p>This section simplistically applies <a
+href="https://cran.r-project.org/web/packages/rpca/index.html">robust
+PCA</a> to the b ion mappings. This turns out to be computationally
+expensive and not well tuned (as is usually the case with simply
+applying algorithms ‘out of the box’). The algorithm eventually
+decomposed down to a single eigenvector but this section shows the
+solution at 18 eigenvectors as it is more interesting.</p>
+<p>The heatmap of the ‘eigenvalues’ shows much more structure than the
+PCA plot but actually does not seem to produce a better clustering of
+the peptides.</p>
+<pre><code>## Warning in RestartableRPCA(cacheFile = &quot;bIonMapRPCAcache18.RData&quot;, bIonMaps, :
+## rpca did not converge after 2095 iterations, final.delta= 0.00000562064894654861</code></pre>
+<p>The eigenvalue plots do show a similar split of the GVYYPDK peptide
+as was seen in the regular PCA.</p>
+<p>Note: many of the points are very near the origin in some plots. A
+‘jitter’ has been added to make these more visible given the scaling of
+the plots.</p>
+<p><img src="RawTraceAnalysisOfMS2_files/figure-html/rPCAeigen-1.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/rPCAeigen-2.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/rPCAeigen-3.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/rPCAeigen-4.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/rPCAeigen-5.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/rPCAeigen-6.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/rPCAeigen-7.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/rPCAeigen-8.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/rPCAeigen-9.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/rPCAeigen-10.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/rPCAeigen-11.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/rPCAeigen-12.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/rPCAeigen-13.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/rPCAeigen-14.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/rPCAeigen-15.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/rPCAeigen-16.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/rPCAeigen-17.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/rPCAeigen-18.png" width="100%" style="display: block; margin: auto;" /></p>
+</div>
+<div id="hierarchical-clustering-of-robust-pca-and-eigenvectors"
+class="section level1">
+<h1>Hierarchical clustering of robust PCA and ‘eigenvectors’</h1>
+<p>The hclust and eigenvectors are shown below. I do not think there is
+much insight to be had from the rPCA in this analysis. Using a
+supervised technique may add more insight.</p>
+<p><img src="RawTraceAnalysisOfMS2_files/figure-html/rPCAdend-1.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/rPCAdend-2.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/rPCAdend-3.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/rPCAdend-4.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/rPCAdend-5.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/rPCAdend-6.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/rPCAdend-7.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/rPCAdend-8.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/rPCAdend-9.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/rPCAdend-10.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/rPCAdend-11.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/rPCAdend-12.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/rPCAdend-13.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/rPCAdend-14.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/rPCAdend-15.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/rPCAdend-16.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/rPCAdend-17.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/rPCAdend-18.png" width="100%" style="display: block; margin: auto;" /><img src="RawTraceAnalysisOfMS2_files/figure-html/rPCAdend-19.png" width="100%" style="display: block; margin: auto;" /></p>
+</div>
+<div id="partial-least-squares-regression-plsr" class="section level1">
+<h1>Partial Least Squares Regression (PLSR)</h1>
+</div>
+<div id="principal-component-regression-pcr" class="section level1">
+<h1>Principal Component Regression (PCR)</h1>
+</div>
+<div id="canonical-powered-partial-least-squares-cppls."
+class="section level1">
+<h1>Canonical Powered Partial Least Squares (CPPLS).</h1>
+</div>
+<div id="discussion" class="section level1">
+<h1>Discussion</h1>
+</div>
+</div>
+
+<div class="col-xs-2">
+
+
+</div>
+</div>
+	
+
+
+</div>
+</div>
+
+ <script>
+    $(document).ready(function () {
+	// add bootstrap table styles to pandoc tables
+	$('tr.header').parent('thead').parent('table').addClass('table table-striped table-hover');
+	
+	
+		$('.pages img').addClass("image-lb");
+	$('.pages').magnificPopup({
+	    type:'image',
+	    closeOnContentClick: false,
+	    closeBtnInside: false,
+            delegate: '.image-lb',
+	    gallery: {enabled: false },
+            removalDelay: 500,
+            callbacks: {
+		beforeOpen: function() {
+                    // just a hack that adds mfp-anim class to markup
+                    this.st.image.markup = this.st.image.markup.replace('mfp-figure', 'mfp-figure mfp-with-anim');
+		}
+            },
+            mainClass: 'mfp-move-from-top',
+	    image: {
+	        verticalFit: true,
+		titleSrc: 'alt'
+	    }
+ 	});
+ 	
+	  
+	$('#toc ul li').first().addClass("active");
+	$('#toc ul li').attr("data-target", function() {
+            return($(this).children("a").attr("href"));
+	})
+	$('body .section.level1').first().addClass("active");
+	$('body .section.level1').not('.active').hide();
+	
+	$('#toc a[href*="#"], a[href^="#"]').not('.nav a[href^="#"]').click(function() {
+	    var id = $(this).attr("href");
+	    if (id === "#") return;
+	    if (id.substring(0, 8) === "#dyntab-") return;
+	    // Menu
+	    var menu_entry = $(".menu li[data-target='"+id+"']");
+	    if (menu_entry.length == 0) {
+			window.location.hash = id;
+			return;
+	    }
+	    menu_entry.addClass("active");
+	    $(".menu li").not(menu_entry).removeClass("active"); 
+	    toggle_page(id);
+	});
+
+	function toggle_page(id) {
+	    $(".page").not(page).removeClass("active").hide();
+	    window.page = id;
+	    var page = $(window.page);
+	    window.location.hash = window.page;
+	    //$(this).addClass("active");
+	    page.show();
+
+	    var totop = setInterval(function () {
+		$(".pages").animate({scrollTop: 0}, 0);
+	    }, 10);
+
+	    setTimeout(function () {
+			page.addClass("active");
+			setTimeout(function () {
+		    	clearInterval(totop);
+			}, 1000);
+	    }, 100);
+	    
+	    window.dispatchEvent(new Event('resize'));
+	}
+
+
+	$(".menu li").click(function () {
+	    toggle_page($(this).data("target"));
+	    // Menu
+	    if (!$(this).data("target")) return;
+	    if ($(this).is(".active")) return;
+	    $(".menu li").not($(this)).removeClass("active");
+	    $(this).addClass("active");
+	});
+  
+	  
+	window.page = window.location.hash;
+	if (window.page != "") {
+	    $(".menu").find("li[data-target='" + window.page + "']").trigger("click");
+	}
+	/* init material bootstrap js */
+	$.material.init();
+    });
+ </script>
+
+
+  <!-- dynamically load mathjax for compatibility with self-contained -->
+ <script>
+   (function () {
+       var script = document.createElement("script");
+       script.type = "text/javascript";
+       script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+       document.getElementsByTagName("head")[0].appendChild(script);
+   })();
+ </script>
+ 
+</body>
+</html>
